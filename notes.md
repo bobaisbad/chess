@@ -1,1 +1,4 @@
-# My notes
+- git add. = stage all files and sub files
+- git commit -m <message> = commit staged files with a message describing the commit
+- git mv <filename> <new filename> = rename file so that git understands the change
+- git rm <filename> = delete file so that git understands the change
