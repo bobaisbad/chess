@@ -10,76 +10,24 @@ public class KingMovesCalculator {
         int col = myPosition.getColumn();
         ArrayList<ChessMove> movesArray = new ArrayList<>();
         ChessPosition newPosition = new ChessPosition(row, col);
-        row += 1;
-        newPosition.setRow(row);
-        System.out.println("{" + row + ", " + col + "}");
 
-        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-            movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-        }
+        int[][] nums = {
+                {row + 1, row + 1, row, row - 1, row - 1, row - 1, row, row + 1},
+                {col, col + 1, col + 1, col + 1, col, col - 1, col - 1, col - 1}
+        };
 
-        col += 1;
-        newPosition.setCol(col);
-        System.out.println("{" + row + ", " + col + "}");
+        for (int i = 0; i < 8; i++) {
+            if (nums[0][i] <= 8 && nums[0][i] >= 1 && nums[1][i] <= 8 && nums[1][i] >= 1) {
+                newPosition.setRow(nums[0][i]);
+                newPosition.setCol(nums[1][i]);
 
-        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-            movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-        }
-
-        row -= 1;
-        newPosition.setRow(row);
-        System.out.println("{" + row + ", " + col + "}");
-
-        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-            movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-        }
-
-        row -= 1;
-        newPosition.setRow(row);
-        System.out.println("{" + row + ", " + col + "}");
-
-        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-            movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-        }
-
-        col -= 1;
-        newPosition.setCol(col);
-        System.out.println("{" + row + ", " + col + "}");
-
-        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-            movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-        }
-
-        col -= 1;
-        newPosition.setCol(col);
-        System.out.println("{" + row + ", " + col + "}");
-
-        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-            movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-        }
-
-        row += 1;
-        newPosition.setRow(row);
-        System.out.println("{" + row + ", " + col + "}");
-
-        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-            movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-        }
-
-        row += 1;
-        newPosition.setRow(row);
-        System.out.println("{" + row + ", " + col + "}");
-
-        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-            movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+                if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
+                    movesArray.add(new ChessMove(myPosition, new ChessPosition(nums[0][i], nums[1][i]), null));
+                    System.out.println("{" + nums[0][i] + ", " + nums[1][i] + "}");
+                }
+            }
         }
 
         return movesArray;
     }
-
-//    private void checkSquare(ChessPiece piece, ChessGame.TeamColor color, ArrayList<ChessMove> array, ) {
-//        if (piece == null || piece.getTeamColor() != color) {
-//            array.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-//        }
-//    }
 }
