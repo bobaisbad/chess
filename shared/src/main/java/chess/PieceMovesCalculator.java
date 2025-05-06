@@ -24,8 +24,9 @@ public class PieceMovesCalculator {
         } else if (type == ChessPiece.PieceType.KNIGHT) {
             KnightMovesCalculator calc = new KnightMovesCalculator();
             return calc.knightCalculator(piece, color, myPosition, board);
-//        } else if (type == ChessPiece.PieceType.BISHOP) {
-//            return BishopMovesCalculator();
+        } else if (type == ChessPiece.PieceType.PAWN) {
+            PawnMovesCalculator calc = new PawnMovesCalculator();
+            return calc.pawnCalculator(piece, color, myPosition, board);
         } else {
             KingMovesCalculator calc = new KingMovesCalculator();
             return calc.kingCalculator(piece, color, myPosition, board);
