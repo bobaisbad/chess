@@ -18,8 +18,9 @@ public class PieceMovesCalculator {
         } else if (type == ChessPiece.PieceType.QUEEN) {
             QueenMovesCalculator calc = new QueenMovesCalculator();
             return calc.queenCalculator(piece, color, myPosition, board);
-//        } else if (type == ChessPiece.PieceType.ROOK) {
-//            //
+        } else if (type == ChessPiece.PieceType.ROOK) {
+            RookMovesCalculator calc = new RookMovesCalculator();
+            return calc.rookCalculator(piece, color, myPosition, board);
 //        } else if (type == ChessPiece.PieceType.KNIGHT) {
 //            //
 //        } else if (type == ChessPiece.PieceType.BISHOP) {
