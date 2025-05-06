@@ -12,10 +12,10 @@ public class PieceMovesCalculator {
         this.type = piece.getPieceType();
         this.color = piece.getTeamColor();
 
-//        if (type == ChessPiece.PieceType.BISHOP) {
-        BishopMovesCalculator calc = new BishopMovesCalculator();
+        if (type == ChessPiece.PieceType.BISHOP) {
+            BishopMovesCalculator calc = new BishopMovesCalculator();
 //        System.out.println("Pushing into Bishop Calc...");
-        return calc.bishopCalculator(piece, color, myPosition, board);
+            return calc.bishopCalculator(piece, color, myPosition, board);
 //        } else if (type == ChessPiece.PieceType.QUEEN) {
 //            //
 //        } else if (type == ChessPiece.PieceType.ROOK) {
@@ -24,8 +24,10 @@ public class PieceMovesCalculator {
 //            //
 //        } else if (type == ChessPiece.PieceType.BISHOP) {
 //            return BishopMovesCalculator();
-//        } else {
-//            //
-//        }
+        } else {
+            KingMovesCalculator calc = new KingMovesCalculator();
+//        System.out.println("Pushing into Bishop Calc...");
+            return calc.kingCalculator(piece, color, myPosition, board);
+        }
     }
 }
