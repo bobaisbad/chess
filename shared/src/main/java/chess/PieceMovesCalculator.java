@@ -21,8 +21,9 @@ public class PieceMovesCalculator {
         } else if (type == ChessPiece.PieceType.ROOK) {
             RookMovesCalculator calc = new RookMovesCalculator();
             return calc.rookCalculator(piece, color, myPosition, board);
-//        } else if (type == ChessPiece.PieceType.KNIGHT) {
-//            //
+        } else if (type == ChessPiece.PieceType.KNIGHT) {
+            KnightMovesCalculator calc = new KnightMovesCalculator();
+            return calc.knightCalculator(piece, color, myPosition, board);
 //        } else if (type == ChessPiece.PieceType.BISHOP) {
 //            return BishopMovesCalculator();
         } else {
