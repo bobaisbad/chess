@@ -12,10 +12,12 @@ import java.util.Objects;
 public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
+    private ChessPosition position;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.position = new ChessPosition(1, 1);
     }
 
     /**
@@ -54,6 +56,14 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         PieceMovesCalculator calc = new PieceMovesCalculator();
         return calc.calculator(board, myPosition);
+    }
+
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    public void setPosition(ChessPosition position) {
+        this.position = position;
     }
 
     @Override
