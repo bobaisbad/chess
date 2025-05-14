@@ -22,7 +22,7 @@ public class KnightMovesCalculator {
                 newPosition.setCol(nums[1][i]);
 
                 if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
-                    System.out.println("{" + nums[0][i] + ", " + nums[1][i] + "}");
+                    // System.out.println("{" + nums[0][i] + ", " + nums[1][i] + "}");
                     movesArray.add(new ChessMove(myPosition, new ChessPosition(nums[0][i], nums[1][i]), null));
                 }
             }

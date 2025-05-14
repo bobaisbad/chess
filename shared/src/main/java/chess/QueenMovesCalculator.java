@@ -41,13 +41,13 @@ public class QueenMovesCalculator {
 
                     if (board.getPiece(newPosition) == null) { // || board.getPiece(newPosition).getTeamColor() != color) {
                         movesArray.add(new ChessMove(myPosition, new ChessPosition(nums[i][j], nums[i + 1][j]), null));
-                        System.out.println("{" + nums[i][j] + ", " + nums[i + 1][j] + "}");
+                        // System.out.println("{" + nums[i][j] + ", " + nums[i + 1][j] + "}");
 //                        if (board.getPiece(newPosition) != null) { // || board.getPiece(newPosition).getTeamColor() != color) {
 //                            break;
 //                        }
                     } else if (board.getPiece(newPosition).getTeamColor() != color) {
                         movesArray.add(new ChessMove(myPosition, new ChessPosition(nums[i][j], nums[i + 1][j]), null));
-                        System.out.println("{" + nums[i][j] + ", " + nums[i + 1][j] + "}");
+                        // System.out.println("{" + nums[i][j] + ", " + nums[i + 1][j] + "}");
                         break;
                     } else {
                         break;

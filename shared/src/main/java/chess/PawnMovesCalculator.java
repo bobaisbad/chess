@@ -18,7 +18,7 @@ public class PawnMovesCalculator {
                     newPosition.setRow(row);
 
                     if (board.getPiece(newPosition) == null) {
-                        System.out.println("Endpoint: {" + row + ", " + col + "}");
+                        // System.out.println("Endpoint: {" + row + ", " + col + "}");
                         movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                     } else {
                         break;
@@ -29,7 +29,7 @@ public class PawnMovesCalculator {
                 newPosition.setRow(row);
 
                 if (board.getPiece(newPosition) == null) {
-                    System.out.println("Endpoint: {" + row + ", " + col + "}");
+                    // System.out.println("Endpoint: {" + row + ", " + col + "}");
                     if (myPosition.getRow() == 2) {
                         ChessPosition promo = new ChessPosition(row, col);
                         movesArray.add(new ChessMove(myPosition, promo, ChessPiece.PieceType.QUEEN));
@@ -55,7 +55,7 @@ public class PawnMovesCalculator {
                     newPosition.setCol(nums[1][i]);
 
                     if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color) {
-                        System.out.println("Endpoint: {" + nums[0][i] + ", " + nums[1][i] + "}");
+                        // System.out.println("Endpoint: {" + nums[0][i] + ", " + nums[1][i] + "}");
                         if (myPosition.getRow() == 2) {
                             ChessPosition promo = new ChessPosition(nums[0][i], nums[1][i]);
                             movesArray.add(new ChessMove(myPosition, promo, ChessPiece.PieceType.QUEEN));
@@ -76,7 +76,7 @@ public class PawnMovesCalculator {
                     newPosition.setRow(row);
 
                     if (board.getPiece(newPosition) == null) {
-                        System.out.println("Endpoint: {" + row + ", " + col + "}");
+                        // System.out.println("Endpoint: {" + row + ", " + col + "}");
                         movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                     } else {
                         break;
@@ -87,7 +87,7 @@ public class PawnMovesCalculator {
                 newPosition.setRow(row);
 
                 if (board.getPiece(newPosition) == null) {
-                    System.out.println("Endpoint: {" + row + ", " + col + "}");
+                    // System.out.println("Endpoint: {" + row + ", " + col + "}");
                     if (myPosition.getRow() == 7) {
                         ChessPosition promo = new ChessPosition(row, col);
                         movesArray.add(new ChessMove(myPosition, promo, ChessPiece.PieceType.QUEEN));
@@ -113,7 +113,7 @@ public class PawnMovesCalculator {
                     newPosition.setCol(nums[1][i]);
 
                     if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color) {
-                        System.out.println("Endpoint: {" + nums[0][i] + ", " + nums[1][i] + "}");
+                        // System.out.println("Endpoint: {" + nums[0][i] + ", " + nums[1][i] + "}");
                         if (myPosition.getRow() == 7) {
                             ChessPosition promo = new ChessPosition(nums[0][i], nums[1][i]);
                             movesArray.add(new ChessMove(myPosition, promo, ChessPiece.PieceType.QUEEN));

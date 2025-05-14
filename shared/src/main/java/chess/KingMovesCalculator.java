@@ -23,7 +23,7 @@ public class KingMovesCalculator {
 
                 if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color) {
                     movesArray.add(new ChessMove(myPosition, new ChessPosition(nums[0][i], nums[1][i]), null));
-                    System.out.println("{" + nums[0][i] + ", " + nums[1][i] + "}");
+                    // System.out.println("{" + nums[0][i] + ", " + nums[1][i] + "}");
                 }
             }
         }

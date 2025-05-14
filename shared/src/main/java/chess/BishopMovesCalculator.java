@@ -22,11 +22,11 @@ public class BishopMovesCalculator {
         while (row <= 8 && col <= 8) { // && (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color)) {
 //            System.out.println("Piece type: " + board.getPiece(newPosition));
             if (board.getPiece(newPosition) == null) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             } else if (board.getPiece(newPosition).getTeamColor() != color) {
 //                System.out.println("Type: " + board.getPiece(newPosition).getPieceType());
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                 break;
             } else {
@@ -47,11 +47,11 @@ public class BishopMovesCalculator {
         while (row >= 1 && col <= 8) { // && (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color)) {
 //            System.out.println("Piece type: " + board.getPiece(newPosition));
             if (board.getPiece(newPosition) == null) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             } else if (board.getPiece(newPosition).getTeamColor() != color) {
 //                System.out.println("Type: " + board.getPiece(newPosition).getPieceType());
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                 break;
             } else {
@@ -72,11 +72,11 @@ public class BishopMovesCalculator {
         while (row >= 1 && col >= 1) { // && (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color)) {
 //            System.out.println("Piece type: " + board.getPiece(newPosition));
             if (board.getPiece(newPosition) == null) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             } else if (board.getPiece(newPosition).getTeamColor() != color) {
 //                System.out.println("Type: " + board.getPiece(newPosition).getPieceType());
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                 break;
             } else {
@@ -97,11 +97,11 @@ public class BishopMovesCalculator {
         while (row <= 8 && col >= 1) { // && (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != color)) {
 //            System.out.println("Piece type: " + board.getPiece(newPosition));
             if (board.getPiece(newPosition) == null) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             } else if (board.getPiece(newPosition).getTeamColor() != color) {
 //                System.out.println("Type: " + board.getPiece(newPosition).getPieceType());
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                 break;
             } else {

@@ -16,10 +16,10 @@ public class RookMovesCalculator {
 
         while (col <= 8) {
             if (board.getPiece(newPosition) == null) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             } else if (board.getPiece(newPosition).getTeamColor() != color) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                 break;
             } else {
@@ -35,10 +35,10 @@ public class RookMovesCalculator {
 
         while (col >= 1) {
             if (board.getPiece(newPosition) == null) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             } else if (board.getPiece(newPosition).getTeamColor() != color) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                 break;
             } else {
@@ -56,10 +56,10 @@ public class RookMovesCalculator {
 
         while (row >= 1) {
             if (board.getPiece(newPosition) == null) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             } else if (board.getPiece(newPosition).getTeamColor() != color) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                 break;
             } else {
@@ -75,10 +75,10 @@ public class RookMovesCalculator {
 
         while (row <= 8) {
             if (board.getPiece(newPosition) == null) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             } else if (board.getPiece(newPosition).getTeamColor() != color) {
-                System.out.println("Endpoint: {" + row + ", " + col + "}");
+                // System.out.println("Endpoint: {" + row + ", " + col + "}");
                 movesArray.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                 break;
             } else {
