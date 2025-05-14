@@ -13,37 +13,35 @@ import java.util.Objects;
 public class ChessGame {
     private TeamColor team = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
-    private ChessBoard simBoard;
-    private ArrayList<ChessPiece> blackPieces = new ArrayList<>();
-    private ArrayList<ChessPiece> whitePieces = new ArrayList<>();
-    private ArrayList<ChessPiece> simBlackPieces = clonePieceArray(blackPieces);
-    private ArrayList<ChessPiece> simWhitePieces = clonePieceArray(whitePieces);
-    private final ChessPiece blackKing;
-    private final ChessPiece whiteKing;
+    // private ChessBoard simBoard;
+    // private ArrayList<ChessPiece> blackPieces = new ArrayList<>();
+    // private ArrayList<ChessPiece> whitePieces = new ArrayList<>();
+    // private ArrayList<ChessPiece> simBlackPieces = new ArrayList<>();
+    // private ArrayList<ChessPiece> simWhitePieces = new ArrayList<>();
+    private final ChessPosition blackKingPosition;
+    private final ChessPosition whiteKingPosition;
 
     public ChessGame() {
         board.resetBoard();
-        ChessPiece piece;
-        ChessPosition position = new ChessPosition(1, 5);
-        blackKing = board.getPiece(position);
-        position.setRow(8);
-        whiteKing = board.getPiece(position);
-
-        for (int i = 1; i < 9; i++) {
-            position.setCol(i);
-            for (int j = 1; j < 3; j++) {
-                position.setRow(j);
-                piece = board.getPiece(position);
-                piece.setPosition(position);
-                whitePieces.add(piece);
-            }
-            for (int l = 7; l < 9; l++) {
-                position.setRow(l);
-                piece = board.getPiece(position);
-                piece.setPosition(position);
-                blackPieces.add(piece);
-            }
-        }
+        // System.out.print(board.getPiece(new ChessPosition(1, 1)).getPieceType());
+//        board.resetBoard();
+//        ChessPiece piece;
+        blackKingPosition = new ChessPosition(8, 5);
+        whiteKingPosition = new ChessPosition(1, 5);
+//
+//        for (int i = 1; i < 9; i++) {
+//            position.setCol(i);
+//            for (int j = 1; j < 3; j++) {
+//                position.setRow(j);
+//                piece = board.getPiece(position);
+//                piece.setPosition(position);
+//            }
+//            for (int l = 7; l < 9; l++) {
+//                position.setRow(l);
+//                piece = board.getPiece(position);
+//                piece.setPosition(position);
+//            }
+//        }
     }
 
     /**
@@ -78,48 +76,72 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        // throw new RuntimeException("Not implemented");
         ChessPiece piece = board.getPiece(startPosition);
 
-        if (piece != null) {
-            Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-
-            for (ChessMove move : moves) {
-                simBoard = board.clone();
-                ChessPiece attacked = simBoard.getPiece(move.getEndPosition());
-
-                if (attacked != null) {
-                    if (attacked.getTeamColor() == TeamColor.WHITE) {
-                        simWhitePieces = clonePieceArray(whitePieces);
-                        simWhitePieces.remove(attacked);
-
-                        for (ChessPiece p : simBlackPieces) {
-                            System.out.println(p.getPieceType());
-                        }
-                    } else {
-                        simBlackPieces = clonePieceArray(blackPieces);
-                        simBlackPieces.remove(attacked);
-
-                        for (ChessPiece p : simBlackPieces) {
-                            System.out.println(p.getPieceType());
-                        }
-                    }
-                }
-
-                simBoard.setPiece(piece, move.getEndPosition());
-                simBoard.setPiece(null, move.getStartPosition());
-                piece.setPosition(move.getEndPosition());
-
-                if (isInCheck(piece.getTeamColor())) {
-                    moves.remove(move);
-                }
-            }
-
-            piece.setPosition(startPosition);
-
-            return moves;
-        } else {
+        if (piece == null) {
             return null;
         }
+
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
+        for (ChessMove move : moves) {
+            ChessBoard copy = board.clone();
+
+            board.setPiece(piece, move.getEndPosition());
+            board.setPiece(null, move.getStartPosition());
+
+            if (isInCheck(piece.getTeamColor())) {
+                moves.remove(move);
+            }
+
+            board = copy;
+        }
+
+        return moves;
+//        ChessPiece piece = board.getPiece(startPosition);
+//
+//        if (piece != null) {
+//            Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
+//            for (ChessMove move : moves) {
+                // simBoard = board.clone();
+                // ChessPiece[][] pieces = simBoard.getPieces();
+                // ChessPiece attacked = simBoard.getPiece(move.getEndPosition());
+
+//                if (attacked != null) {
+//                    ChessPosition off = new ChessPosition(0, 0);
+//                    attacked.setPosition(off);
+//                    if (attacked.getTeamColor() == TeamColor.WHITE) {
+//                        // simWhitePieces = (ArrayList<ChessPiece>) whitePieces.clone();
+//                        // simWhitePieces = clonePieceArray(whitePieces, attacked);
+//                        // simWhitePieces.remove(attacked);
+//                    } else {
+//                        // simBlackPieces = (ArrayList<ChessPiece>) blackPieces.clone();
+//                        // simBlackPieces = clonePieceArray(blackPieces, attacked);
+//                        // simBlackPieces.remove(attacked);
+//                    }
+//                }
+//
+//                simBoard.setPiece(piece, move.getEndPosition());
+//                simBoard.setPiece(null, move.getStartPosition());
+//                piece.setPosition(move.getEndPosition());
+//
+//                if (isInCheck(piece.getTeamColor())) {
+//                    moves.remove(move);
+//                }
+//
+//                if (attacked != null) {
+//                    attacked.setPosition(move.getEndPosition());
+//                }
+//            }
+//
+//            piece.setPosition(startPosition);
+//
+//            return moves;
+//        } else {
+//            return null;
+//        }
     }
 
     /**
@@ -131,11 +153,28 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
 
+        // for (ChessMove movement : moves) {
         if (moves.contains(move)) {
-            //
+            board.setPiece(board.getPiece(move.getStartPosition()), move.getEndPosition());
+            board.setPiece(null, move.getStartPosition());
+
+            if (team == TeamColor.WHITE) {
+                setTeamTurn(TeamColor.BLACK);
+            } else {
+                setTeamTurn(TeamColor.WHITE);
+            }
         } else {
+            // }
             throw new InvalidMoveException();
         }
+        // throw new RuntimeException("Not implemented");
+//        Collection<ChessMove> moves = validMoves(move.getStartPosition());
+//
+//        if (moves.contains(move)) {
+//            //
+//        } else {
+//            throw new InvalidMoveException();
+//        }
     }
 
     /**
@@ -145,32 +184,88 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        Collection<ChessMove> enemyMoves;
+        // throw new RuntimeException("Not implemented");
+        ChessPosition position = new ChessPosition(1, 1);
 
-        if (teamColor == TeamColor.WHITE) {
-            for (ChessPiece enemy : simBlackPieces) {
-                enemyMoves = enemy.pieceMoves(simBoard, enemy.getPosition());
+        for (int i = 1; i < 9; i++) {
+            position.setRow(i);
+            for (int j = 1; j < 9; j++) {
+                position.setCol(j);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
 
-                for (ChessMove move : enemyMoves) {
-                    if (move.getEndPosition() == whiteKing.getPosition()) {
-                        return true;
-                    }
-                }
-            }
-
-        } else {
-            for (ChessPiece enemy : simWhitePieces) {
-                enemyMoves = enemy.pieceMoves(simBoard, enemy.getPosition());
-
-                for (ChessMove move : enemyMoves) {
-                    if (move.getEndPosition() == blackKing.getPosition()) {
-                        return true;
+                    for (ChessMove move : moves) {
+                        if (teamColor == TeamColor.WHITE && move.getEndPosition() == whiteKingPosition) {
+                            return true;
+                        } else if (teamColor == TeamColor.BLACK && move.getEndPosition() == blackKingPosition) {
+                            return true;
+                        }
                     }
                 }
             }
         }
 
         return false;
+
+//        Collection<ChessMove> enemyMoves;
+//        ChessPosition off = new ChessPosition(0, 0);
+//        simBoard = board.clone();
+//        ChessPiece[][] pieces = simBoard.getPieces();
+//        ChessPiece enemy;
+//
+////        System.out.println("Comparing clones...");
+////        System.out.println(simBoard.getPieces() == board.getPieces());
+////        System.out.println(simBoard == board);
+//
+//        System.out.print("White Pieces: {");
+//        for (int i = 0; i < 15; i++) {
+//            System.out.print(board.getPieces()[1][1] + ", ");
+//        }
+//        System.out.print(board.getPieces()[1][15] + "}\n\n");
+//
+//        System.out.print("White Sim Pieces: {");
+//        for (int i = 0; i < 15; i++) {
+//            System.out.print(simBoard.getPieces()[1][1] + ", ");
+//        }
+//        System.out.print(simBoard.getPieces()[1][15] + "}\n\n");
+//
+//
+//        if (teamColor == TeamColor.WHITE) {
+//            for (int i = 0; i < 16; i++) {
+//            // for (ChessPiece[][] enemy : pieces) {
+//                // if (simBoard.getPiece(enemy.getPosition()) != null) {
+//                    // enemyMoves = enemy.pieceMoves(simBoard, enemy.getPosition());
+//                enemy = pieces[1][i];
+//                if (enemy != null && enemy.getPosition() != off) {
+//                    enemyMoves = enemy.pieceMoves(simBoard, enemy.getPosition());
+//
+//                    for (ChessMove move : enemyMoves) {
+//                        if (move.getEndPosition() == whiteKing.getPosition()) {
+//                            return true;
+//                        }
+//                    }
+//                }
+//            }
+//        } else {
+//            for (int i = 0; i < 16; i++) {
+//                // for (ChessPiece[][] enemy : pieces) {
+//                // if (simBoard.getPiece(enemy.getPosition()) != null) {
+//                // enemyMoves = enemy.pieceMoves(simBoard, enemy.getPosition());
+//                enemy = pieces[0][i];
+//                if (enemy != null && enemy.getPosition() != off) {
+//                    enemyMoves = enemy.pieceMoves(simBoard, enemy.getPosition());
+//
+//                    for (ChessMove move : enemyMoves) {
+//                        if (move.getEndPosition() == blackKing.getPosition()) {
+//                            return true;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return false;
     }
 
     /**
@@ -226,13 +321,15 @@ public class ChessGame {
         return Objects.hash(team, board);
     }
 
-    public ArrayList<ChessPiece> clonePieceArray(ArrayList<ChessPiece> pieces) {
-        ArrayList<ChessPiece> clonedPieces = new ArrayList<>();
-
-        for (ChessPiece piece : pieces) {
-            clonedPieces.add(piece);
-        }
-
-        return clonedPieces;
-    }
+//    public ArrayList<ChessPiece> clonePieceArray(ArrayList<ChessPiece> pieces, ChessPiece removed) {
+//        ArrayList<ChessPiece> clonedPieces = new ArrayList<>();
+//
+//        for (ChessPiece piece : pieces) {
+//            if (!piece.equals(removed)) {
+//                clonedPieces.add(piece);
+//            }
+//        }
+//
+//        return clonedPieces;
+//    }
 }
