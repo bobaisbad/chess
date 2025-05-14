@@ -18,8 +18,8 @@ public class ChessGame {
     // private ArrayList<ChessPiece> whitePieces = new ArrayList<>();
     // private ArrayList<ChessPiece> simBlackPieces = new ArrayList<>();
     // private ArrayList<ChessPiece> simWhitePieces = new ArrayList<>();
-    private final ChessPosition blackKingPosition;
-    private final ChessPosition whiteKingPosition;
+    private ChessPosition blackKingPosition;
+    private ChessPosition whiteKingPosition;
 
     public ChessGame() {
         board.resetBoard();
@@ -151,12 +151,39 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (board.getPiece(move.getStartPosition()) == null ||
+            board.getPiece(move.getStartPosition()).getTeamColor() != team) {
+            throw new InvalidMoveException();
+        }
+
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
 
         // for (ChessMove movement : moves) {
         if (moves.contains(move)) {
-            board.setPiece(board.getPiece(move.getStartPosition()), move.getEndPosition());
+            ChessPiece piece;
+
+            if (move.getPromotionPiece() == ChessPiece.PieceType.QUEEN) {
+                piece = new ChessPiece(team, ChessPiece.PieceType.QUEEN);
+            } else if (move.getPromotionPiece() == ChessPiece.PieceType.ROOK) {
+                piece = new ChessPiece(team, ChessPiece.PieceType.ROOK);
+            } else if (move.getPromotionPiece() == ChessPiece.PieceType.KNIGHT) {
+                piece = new ChessPiece(team, ChessPiece.PieceType.KNIGHT);
+            } else if (move.getPromotionPiece() == ChessPiece.PieceType.BISHOP) {
+                piece = new ChessPiece(team, ChessPiece.PieceType.BISHOP);
+            } else {
+                piece = board.getPiece(move.getStartPosition());
+            }
+
+            board.setPiece(piece, move.getEndPosition());
             board.setPiece(null, move.getStartPosition());
+
+            if (board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING) {
+                if (team == TeamColor.WHITE) {
+                    whiteKingPosition = move.getEndPosition();
+                } else {
+                    blackKingPosition = move.getEndPosition();
+                }
+            }
 
             if (team == TeamColor.WHITE) {
                 setTeamTurn(TeamColor.BLACK);
