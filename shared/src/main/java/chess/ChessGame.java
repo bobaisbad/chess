@@ -207,26 +207,7 @@ public class ChessGame {
             return false;
         }
 
-        ChessPosition position = new ChessPosition(1, 1);
-
-        updateKings(position);
-
-        for (int i = 1; i < 9; i++) {
-            position.setRow(i);
-            for (int j = 1; j < 9; j++) {
-                position.setCol(j);
-                ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = validMoves(position);
-
-                    if (!moves.isEmpty()) {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
+        return isInCheckmate(teamColor);
     }
 
     /**
