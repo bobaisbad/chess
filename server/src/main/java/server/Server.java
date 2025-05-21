@@ -46,38 +46,38 @@ public class Server {
         res.body(new Gson().toJson(info));
     }
 
-    private Object clear(Request req, Response res) throws DataAccessException {
+    private Object clear(Request req, Response res) throws ParentException {
         clearService.clearAllData();
         return new Gson().toJson(new ClearResult());
     }
 
-    private Object register(Request req, Response res) throws DataAccessException, TakenException, BadRequestException {
+    private Object register(Request req, Response res) throws ParentException {
         var registerReq = new Gson().fromJson(req.body(), RegisterRequest.class);
         return new Gson().toJson(userService.register(registerReq));
     }
 
-    private Object login(Request req, Response res) throws DataAccessException, BadRequestException, UnauthorizedException {
+    private Object login(Request req, Response res) throws ParentException {
         var loginReq = new Gson().fromJson(req.body(), LoginRequest.class);
         return new Gson().toJson(userService.login(loginReq));
     }
 
-    private Object logout(Request req, Response res) throws DataAccessException, UnauthorizedException {
+    private Object logout(Request req, Response res) throws ParentException {
         LogoutRequest logoutReq = new LogoutRequest(req.headers("authorization"));
         return new Gson().toJson(userService.logout(logoutReq));
     }
 
-    private Object create(Request req, Response res) throws DataAccessException, UnauthorizedException, BadRequestException {
+    private Object create(Request req, Response res) throws ParentException {
         var createReq1 = new Gson().fromJson(req.body(), CreateRequest.class);
         CreateRequest createReq2 = new CreateRequest(createReq1.gameName(), req.headers("authorization"));
         return new Gson().toJson(gameService.create(createReq2));
     }
 
-    private Object list(Request req, Response res) throws DataAccessException, UnauthorizedException {
+    private Object list(Request req, Response res) throws ParentException {
         ListRequest listReq = new ListRequest(req.headers("authorization"));
         return new Gson().toJson(gameService.list(listReq));
     }
 
-    private Object join(Request req, Response res) throws DataAccessException, UnauthorizedException, BadRequestException, TakenException {
+    private Object join(Request req, Response res) throws ParentException {
         var joinReq1 = new Gson().fromJson(req.body(), JoinRequest.class);
         JoinRequest joinReq2 = new JoinRequest(joinReq1.playerColor(), joinReq1.gameID(), req.headers("authorization"));
         return new Gson().toJson(gameService.join(joinReq2));

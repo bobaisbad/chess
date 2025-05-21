@@ -18,7 +18,7 @@ public class UserService {
         this.authAccess = authAccess;
     }
 
-    public LoginResult login(LoginRequest req) throws DataAccessException, BadRequestException, UnauthorizedException {
+    public LoginResult login(LoginRequest req) throws ParentException {
         UserData user = userAccess.getUser(req.username());
 
         if (req.password() == null || req.username() == null) {
@@ -31,7 +31,7 @@ public class UserService {
         return new LoginResult(auth.username(), auth.authToken());
     }
 
-    public LogoutResult logout(LogoutRequest req) throws DataAccessException, UnauthorizedException {
+    public LogoutResult logout(LogoutRequest req) throws ParentException {
         if (authAccess.validateAuth(req.authToken())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
         }
@@ -40,7 +40,7 @@ public class UserService {
         return new LogoutResult();
     }
 
-    public RegisterResult register(RegisterRequest req) throws DataAccessException, TakenException, BadRequestException {
+    public RegisterResult register(RegisterRequest req) throws ParentException {
         UserData user = userAccess.getUser(req.username());
 
         if (user != null) {

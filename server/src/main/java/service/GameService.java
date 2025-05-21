@@ -20,7 +20,7 @@ public class GameService {
         this.authAccess = authAccess;
     }
 
-    public CreateResult create(CreateRequest req) throws DataAccessException, UnauthorizedException, BadRequestException {
+    public CreateResult create(CreateRequest req) throws ParentException {
         if (authAccess.validateAuth(req.authToken())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
         } else if (req.gameName() == null) {
@@ -31,7 +31,7 @@ public class GameService {
         return new CreateResult(gameID);
     }
 
-    public JoinResult join(JoinRequest req) throws DataAccessException, UnauthorizedException, BadRequestException, TakenException {
+    public JoinResult join(JoinRequest req) throws ParentException {
         if (authAccess.validateAuth(req.authToken())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
         }
@@ -65,7 +65,7 @@ public class GameService {
         }
     }
 
-    public ListResult list(ListRequest req) throws DataAccessException, UnauthorizedException {
+    public ListResult list(ListRequest req) throws ParentException {
         if (authAccess.validateAuth(req.authToken())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
         }

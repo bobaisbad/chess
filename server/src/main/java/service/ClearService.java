@@ -13,7 +13,7 @@ public class ClearService {
         this.userAccess = userAccess;
     }
 
-    public void clearAllData() throws DataAccessException {
+    public void clearAllData() throws ParentException {
         userAccess.deleteAllUsers();
         gameAccess.deleteAllGames();
         authAccess.deleteAllAuth();
