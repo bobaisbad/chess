@@ -19,11 +19,14 @@ public class UserService {
         this.authAccess = authAccess;
     }
 
-    public LoginResult login(LoginRequest req) throws DataAccessException, BadRequestException {
+    public LoginResult login(LoginRequest req) throws DataAccessException, BadRequestException, UnauthorizedException {
         UserData user = userAccess.getUser(req.username());
 
-        if (user == null || !user.password().equals(req.password())) {
+        if (req.password() == null || req.username() == null) {
             throw new BadRequestException("Error: bad request", 400);
+        } else if (user == null || !user.password().equals(req.password())) {
+            throw new UnauthorizedException("Error: unauthorized", 401);
+//            throw new BadRequestException("Error: bad request", 400);
         }
 
         AuthData auth = authAccess.createAuth(req.username());

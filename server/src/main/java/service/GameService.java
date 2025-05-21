@@ -21,9 +21,11 @@ public class GameService {
         this.authAccess = authAccess;
     }
 
-    public CreateResult create(CreateRequest req) throws DataAccessException, UnauthorizedException {
+    public CreateResult create(CreateRequest req) throws DataAccessException, UnauthorizedException, BadRequestException {
         if (authAccess.validateAuth(req.authToken())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
+        } else if (req.gameName() == null) {
+            throw new BadRequestException("Error: bad request", 400);
         }
 
         int gameID = gameAccess.createGame(req.gameName());
@@ -39,28 +41,28 @@ public class GameService {
 
         if (game == null || req.playerColor() == null) {
             throw new BadRequestException("Error: bad request", 400);
-        } else {
-            if (req.playerColor().equals("WHITE")) {
-                if (game.whiteUsername() != null) {
-                    throw new TakenException("Error: already taken", 403);
-                }
+        }
 
-                String username = authAccess.getUsername(req.authToken());
-                gameAccess.updateGame(game, req.playerColor(), username);
-                return new JoinResult();
-
-            } else if (req.playerColor().equals("BLACK")) {
-                if (game.blackUsername() != null) {
-                    throw new TakenException("Error: already taken", 403);
-                }
-
-                String username = authAccess.getUsername(req.authToken());
-                gameAccess.updateGame(game, req.playerColor(), username);
-                return new JoinResult();
-
-            } else {
-                throw new BadRequestException("Error: bad request", 400);
+        if (req.playerColor().equals("WHITE")) {
+            if (game.whiteUsername() != null) {
+                throw new TakenException("Error: already taken", 403);
             }
+
+            String username = authAccess.getUsername(req.authToken());
+            gameAccess.updateGame(game, req.playerColor(), username);
+            return new JoinResult();
+
+        } else if (req.playerColor().equals("BLACK")) {
+            if (game.blackUsername() != null) {
+                throw new TakenException("Error: already taken", 403);
+            }
+
+            String username = authAccess.getUsername(req.authToken());
+            gameAccess.updateGame(game, req.playerColor(), username);
+            return new JoinResult();
+
+        } else {
+            throw new BadRequestException("Error: bad request", 400);
         }
     }
 

@@ -83,7 +83,7 @@ public class Server {
         return new Gson().toJson(userService.logout(logoutReq));
     }
 
-    private Object create(Request req, Response res) throws DataAccessException, UnauthorizedException {
+    private Object create(Request req, Response res) throws DataAccessException, UnauthorizedException, BadRequestException {
         var createReq1 = new Gson().fromJson(req.body(), CreateRequest.class);
         CreateRequest createReq2 = new CreateRequest(createReq1.gameName(), req.headers("authorization"));
 //        GameService gameService = new GameService();
