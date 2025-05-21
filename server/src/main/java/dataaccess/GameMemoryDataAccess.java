@@ -2,10 +2,12 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
+import model.GameInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class GameMemoryDataAccess implements GameDAO {
     private final HashMap<Integer, GameData> games = new HashMap<>();
@@ -14,25 +16,36 @@ public class GameMemoryDataAccess implements GameDAO {
     public int createGame(String gameName) throws DataAccessException {
         gameCount++;
         ChessGame game = new ChessGame();
-        GameData data = new GameData(gameCount, "", "", gameName, game);
+        GameData data = new GameData(gameCount, null, null, gameName, game);
         games.put(gameCount, data);
         return gameCount;
     }
 
     public GameData getGame(int gameID) throws DataAccessException {
-        return new GameData(0, "0", "0", "0", new ChessGame());
+        return games.get(gameID);
     }
 
-    public Collection<GameData> listGames() throws DataAccessException {
-        return new ArrayList<>();
-    } // (AuthData authToken);
+    public Collection<GameInfo> listGames() throws DataAccessException {
+        HashSet<GameInfo> info = new HashSet<>();
+        GameData data;
 
-    public GameData updateGame(GameData gameData) throws DataAccessException {
-        return new GameData(0, "0", "0", "0", new ChessGame());
+        for (int key : games.keySet()) {
+            data = games.get(key);
+            info.add(new GameInfo(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName()));
+        }
+        return info;
+    }
+
+    public void updateGame(GameData game, String playerColor, String username) throws DataAccessException {
+        if (playerColor.equals("WHITE")) {
+            games.put(game.gameID(), new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game()));
+        } else {
+            games.put(game.gameID(), new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game()));
+        }
     }
 
     public void deleteGame(int gameID) throws DataAccessException {
-        //
+        games.remove(gameID);
     }
 
     public void deleteAllGames() throws DataAccessException {

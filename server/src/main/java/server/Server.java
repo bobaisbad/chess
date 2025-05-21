@@ -1,10 +1,7 @@
 package server;
 
 import dataaccess.DataAccessException;
-import request.CreateRequest;
-import request.LoginRequest;
-import request.LogoutRequest;
-import request.RegisterRequest;
+import request.*;
 import service.*;
 import spark.*;
 import com.google.gson.Gson;
@@ -22,8 +19,8 @@ public class Server {
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.post("/game", this::create);
-//        Spark.get("/game", this::listGames);
-//        Spark.put("/game", this::join);
+        Spark.get("/game", this::list);
+        Spark.put("/game", this::join);
 
 //        Spark.put("/game", (req, res) -> "Insert join code here");
 //        Spark.post("/game", (req, res) -> "Insert create code here");
@@ -74,5 +71,18 @@ public class Server {
         CreateRequest createReq2 = new CreateRequest(createReq1.gameName(), req.headers("authorization"));
         GameService gameService = new GameService();
         return new Gson().toJson(gameService.create(createReq2));
+    }
+
+    private Object list(Request req, Response res) throws DataAccessException {
+        ListRequest listReq = new ListRequest(req.headers("authorization"));
+        GameService gameService = new GameService();
+        return new Gson().toJson(gameService.list(listReq));
+    }
+
+    private Object join(Request req, Response res) throws DataAccessException {
+        var joinReq1 = new Gson().fromJson(req.body(), JoinRequest.class);
+        JoinRequest joinReq2 = new JoinRequest(joinReq1.playerColor(), joinReq1.gameID(), req.headers("authorization"));
+        GameService gameService = new GameService();
+        return new Gson().toJson(gameService.join(joinReq2));
     }
 }

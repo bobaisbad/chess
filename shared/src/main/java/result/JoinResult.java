@@ -1,4 +1,3 @@
 package result;
 
-public record JoinResult() {
-}
+public record JoinResult() {}

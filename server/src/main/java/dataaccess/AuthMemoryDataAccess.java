@@ -32,4 +32,9 @@ public class AuthMemoryDataAccess implements AuthDAO {
     public boolean validateAuth(String authToken) throws DataAccessException {
         return auths.containsKey(authToken);
     }
+
+    public String getUsername(String authToken) throws DataAccessException {
+        AuthData data = auths.get(authToken);
+        return data.username();
+    }
 }
