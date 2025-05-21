@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class AuthMemoryDataAccess implements AuthDAO {
-    private HashMap<String, AuthData> auths = new HashMap<>();
+    private final HashMap<String, AuthData> auths = new HashMap<>();
 
     public AuthData createAuth(String username) throws DataAccessException {
         String token = UUID.randomUUID().toString();

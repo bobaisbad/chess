@@ -6,7 +6,7 @@ import request.RegisterRequest;
 import java.util.HashMap;
 
 public class UserMemoryDataAccess implements UserDAO {
-    private HashMap<String, UserData> users = new HashMap<>();
+    private final HashMap<String, UserData> users = new HashMap<>();
 
     public void createUser(RegisterRequest req) throws DataAccessException {
         UserData user = new UserData(req.username(), req.password(), req.email());

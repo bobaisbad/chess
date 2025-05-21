@@ -64,8 +64,15 @@ public class Server {
     }
 
     private Object logout(Request req, Response res) throws DataAccessException {
-        LogoutRequest logoutReq = new LogoutRequest(req.headers("Authorization"));
+        LogoutRequest logoutReq = new LogoutRequest(req.headers("authorization"));
         UserService userService = new UserService();
         return new Gson().toJson(userService.logout(logoutReq));
+    }
+
+    private Object create(Request req, Response res) throws DataAccessException {
+        var createReq1 = new Gson().fromJson(req.body(), CreateRequest.class);
+        CreateRequest createReq2 = new CreateRequest(createReq1.gameName(), req.headers("authorization"));
+        GameService gameService = new GameService();
+        return new Gson().toJson(gameService.create(createReq2));
     }
 }
