@@ -4,7 +4,7 @@ import result.ClearResult;
 
 public class ClearService {
 
-    public ClearResult clear() {
+    public ClearResult clearAllData() {
         return new ClearResult();
     }
 }

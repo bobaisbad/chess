@@ -1,12 +1,13 @@
 package dataaccess;
 
 import model.UserData;
+import request.RegisterRequest;
 
 public interface UserDAO {
 
-    UserData createUser(UserData userData);
+    void createUser(RegisterRequest req) throws DataAccessException;
 
-    void deleteUser(UserData userData);
+    void deleteUser(UserData userData) throws DataAccessException;
 
-    UserData getUser(String username);
+    UserData getUser(String username) throws DataAccessException;
 }

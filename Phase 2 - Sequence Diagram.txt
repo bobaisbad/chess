@@ -60,6 +60,14 @@ Client -> Server: [DELETE] /session\nauthToken
 Server -> Handler: authToken
 // Where is the authToken verified?
 Handler -> Service: logout(LogoutRequest)
+Service -> DataAccess: validateAuth(authToken)
+DataAccess -> db: Find AuthData
+break Invalid authToken
+DataAccess --> Service: null
+Service --> Server: InvalidAuthException
+Server --> Client: 401\n{"message": "Error: unauthorized"}
+end
+DataAccess --> Service: AuthData
 Service -> DataAccess: deleteAuth(authToken)
 DataAccess -> db: Delete AuthData
 DataAccess --> Service: null
@@ -79,6 +87,14 @@ Client -> Server: [GET] /game\nauthToken
 Server -> Handler: authToken
 // Where is the authToken verified?
 Handler -> Service: games(GamesRequest)
+Service -> DataAccess: validateAuth(authToken)
+DataAccess -> db: Find AuthData
+break Invalid authToken
+DataAccess --> Service: null
+Service --> Server: InvalidAuthException
+Server --> Client: 401\n{"message": "Error: unauthorized"}
+end
+DataAccess --> Service: AuthData
 Service -> DataAccess: listGames(authToken)
 DataAccess -> db: Find all GameData
 DataAccess --> Service: GameData
@@ -97,6 +113,14 @@ Client -> Server: [POST] /game\nauthToken\n{"gameName":" "}
 
 Server -> Handler:authToken\n{"gameName":" "}
 Handler -> Service: createGame(CreateGameRequest)
+Service -> DataAccess: validateAuth(authToken)
+DataAccess -> db: Find AuthData
+break Invalid authToken
+DataAccess --> Service: null
+Service --> Server: InvalidAuthException
+Server --> Client: 401\n{"message": "Error: unauthorized"}
+end
+DataAccess --> Service: AuthData
 Service -> DataAccess:createGame(gameData)
 DataAccess -> db: Add GameData
 Service --> Handler: CreateGameResult
@@ -114,10 +138,23 @@ Client -> Server: [PUT] /game\nauthToken\n{"playerColor":"WHITE/BLACK", "gameID"
 
 Server -> Handler: authToken\n{"playerColor":"WHITE/BLACK", "gameID": 1234}
 Handler -> Service: joinGame(JoinGameRequest)
+Service -> DataAccess: validateAuth(authToken)
+DataAccess -> db: Find AuthData
+break Invalid authToken
+DataAccess --> Service: null
+Service --> Server: InvalidAuthException
+Server --> Client: 401\n{"message": "Error: unauthorized"}
+end
+DataAccess --> Service: AuthData
 Service -> DataAccess: getGame(gameID)
 DataAccess -> db: Find GameData by gameID
 break Place in game already taken
 DataAccess --> Service: null
+Service --> Server: BadRequest
+Server --> Client: 400\n{"message": "Error: bad request"}
+end
+DataAccess --> Service: GameData
+break Place in game already taken
 Service --> Server: AlreadyTakenException
 Server --> Client: 403\n{"message": "Error: already taken"}
 end
@@ -138,8 +175,12 @@ Client -> Server: [DELETE] /db
 
 Server -> Handler: {}
 Handler -> Service:clear()
-Service -> DataAccess: clear()
-DataAccess -> db: Clear all data
+Service -> DataAccess: clearUser()
+DataAccess -> db: Clear UserData
+Service -> DataAccess: clearGame()
+DataAccess -> db: Clear GameData
+Service -> DataAccess: clearAuth()
+DataAccess -> db: Clear AuthData
 DataAccess --> Service: null
 Service --> Handler: ClearResult
 Handler --> Server: {}
