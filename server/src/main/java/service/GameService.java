@@ -13,7 +13,6 @@ import result.ListResult;
 import java.util.Collection;
 
 public class GameService {
-//    private final AuthDAO authAccess = new AuthMemoryDataAccess();
     private final GameDAO gameAccess = new GameMemoryDataAccess();
     private final AuthDAO authAccess;
 

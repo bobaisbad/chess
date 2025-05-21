@@ -1,4 +1,3 @@
 package model;
 
-public record ExceptionInfo(String message) {
-}
+public record ExceptionInfo(String message) {}

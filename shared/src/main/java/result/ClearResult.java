@@ -1,4 +1,3 @@
 package result;
 
-public record ClearResult() {
-}
+public record ClearResult() {}

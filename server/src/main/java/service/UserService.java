@@ -12,7 +12,6 @@ import result.RegisterResult;
 
 public class UserService {
     private final UserDAO userAccess = new UserMemoryDataAccess();
-//    private final AuthDAO authAccess = new AuthMemoryDataAccess();
     private final AuthDAO authAccess;
 
     public UserService(AuthDAO authAccess) {
@@ -26,7 +25,6 @@ public class UserService {
             throw new BadRequestException("Error: bad request", 400);
         } else if (user == null || !user.password().equals(req.password())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
-//            throw new BadRequestException("Error: bad request", 400);
         }
 
         AuthData auth = authAccess.createAuth(req.username());
