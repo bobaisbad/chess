@@ -7,6 +7,7 @@ import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
 import result.LogoutResult;
@@ -30,7 +31,14 @@ public class UserService {
         return new LoginResult(auth.username(), auth.authToken());
     }
 
-    public LogoutResult logout() {
+    public LogoutResult logout(LogoutRequest req) throws DataAccessException {
+        AuthMemoryDataAccess authAccess = new AuthMemoryDataAccess();
+
+        if (!authAccess.validateAuth(req.authToken())) {
+            //
+        }
+
+        authAccess.deleteAuth(req.authToken());
         return new LogoutResult();
     }
 

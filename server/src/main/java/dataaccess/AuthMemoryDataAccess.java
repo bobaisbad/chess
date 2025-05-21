@@ -21,8 +21,8 @@ public class AuthMemoryDataAccess implements AuthDAO {
 //        return auths.get(username);
 //    }
 
-    public AuthData deleteAuth(AuthData authToken) throws DataAccessException {
-        return new AuthData("0", "0");
+    public void deleteAuth(String authToken) throws DataAccessException {
+        auths.remove(authToken);
     }
 
     public boolean validateAuth(String authToken) throws DataAccessException {

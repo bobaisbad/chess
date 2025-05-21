@@ -2,6 +2,7 @@ package server;
 
 import dataaccess.DataAccessException;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import service.*;
 import spark.*;
@@ -18,7 +19,7 @@ public class Server {
 //        Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
-//        Spark.delete("/session", this::logout);
+        Spark.delete("/session", this::logout);
 //        Spark.get("/game", this::listGames);
 //        Spark.post("/game", this::create);
 //        Spark.put("/game", this::join);
@@ -58,5 +59,11 @@ public class Server {
         var loginReq = new Gson().fromJson(req.body(), LoginRequest.class);
         UserService userService = new UserService();
         return new Gson().toJson(userService.login(loginReq));
+    }
+
+    private Object logout(Request req, Response res) throws DataAccessException {
+        LogoutRequest logoutReq = new LogoutRequest(req.headers("Authorization"));
+        UserService userService = new UserService();
+        return new Gson().toJson(userService.logout(logoutReq));
     }
 }
