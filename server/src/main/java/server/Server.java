@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.DataAccessException;
+import request.CreateRequest;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -16,12 +17,12 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-//        Spark.delete("/db", this::clear);
+        Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
+        Spark.post("/game", this::create);
 //        Spark.get("/game", this::listGames);
-//        Spark.post("/game", this::create);
 //        Spark.put("/game", this::join);
 
 //        Spark.put("/game", (req, res) -> "Insert join code here");
@@ -44,11 +45,12 @@ public class Server {
         Spark.awaitStop();
     }
 
-//    private Object clear(Request req, Response res) {
-//        ClearService clearService = new ClearService();
-//        return clearService.clearAllData();
-//    }
-//
+    private Object clear(Request req, Response res) throws DataAccessException {
+        ClearService clearService = new ClearService();
+        clearService.clearAllData();
+        return "";
+    }
+
     private Object register(Request req, Response res) throws DataAccessException {
         var registerReq = new Gson().fromJson(req.body(), RegisterRequest.class);
         UserService userService = new UserService();

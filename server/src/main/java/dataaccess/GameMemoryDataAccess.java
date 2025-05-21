@@ -5,8 +5,10 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 public class GameMemoryDataAccess implements GameDAO {
+    private HashMap<Integer, GameData> games = new HashMap<>();
 
     public GameData createGame(GameData gameData) throws DataAccessException {
         return new GameData(0, "0", "0", "0", new ChessGame());
@@ -26,5 +28,9 @@ public class GameMemoryDataAccess implements GameDAO {
 
     public void deleteGame(int gameID) throws DataAccessException {
         //
+    }
+
+    public void deleteAllGames() throws DataAccessException {
+        games.clear();
     }
 }

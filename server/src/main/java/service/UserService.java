@@ -14,7 +14,6 @@ import result.LogoutResult;
 import result.RegisterResult;
 
 public class UserService {
-    // UUID.randomUUID().toString()
 
     public LoginResult login(LoginRequest req) throws DataAccessException {
         UserDAO userAccess = new UserMemoryDataAccess();
