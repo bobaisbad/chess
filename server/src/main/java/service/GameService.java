@@ -1,8 +1,6 @@
 package service;
 
-import dataaccess.AuthMemoryDataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.GameMemoryDataAccess;
+import dataaccess.*;
 import model.GameData;
 import model.GameInfo;
 import request.CreateRequest;
@@ -15,35 +13,36 @@ import result.ListResult;
 import java.util.Collection;
 
 public class GameService {
+//    private final AuthDAO authAccess = new AuthMemoryDataAccess();
+    private final GameDAO gameAccess = new GameMemoryDataAccess();
+    private final AuthDAO authAccess;
 
-    public CreateResult create(CreateRequest req) throws DataAccessException {
-        AuthMemoryDataAccess authAccess = new AuthMemoryDataAccess();
+    public GameService(AuthDAO authAccess) {
+        this.authAccess = authAccess;
+    }
 
-        if (!authAccess.validateAuth(req.authToken())) {
-            //
+    public CreateResult create(CreateRequest req) throws DataAccessException, UnauthorizedException {
+        if (authAccess.validateAuth(req.authToken())) {
+            throw new UnauthorizedException("Error: unauthorized", 401);
         }
 
-        GameMemoryDataAccess gameAccess = new GameMemoryDataAccess();
         int gameID = gameAccess.createGame(req.gameName());
         return new CreateResult(gameID);
     }
 
-    public JoinResult join(JoinRequest req) throws DataAccessException {
-        AuthMemoryDataAccess authAccess = new AuthMemoryDataAccess();
-
-        if (!authAccess.validateAuth(req.authToken())) {
-            //
+    public JoinResult join(JoinRequest req) throws DataAccessException, UnauthorizedException, BadRequestException, TakenException {
+        if (authAccess.validateAuth(req.authToken())) {
+            throw new UnauthorizedException("Error: unauthorized", 401);
         }
 
-        GameMemoryDataAccess gameAccess = new GameMemoryDataAccess();
         GameData game = gameAccess.getGame(req.gameID());
 
-        if (game == null) {
-            //
+        if (game == null || req.playerColor() == null) {
+            throw new BadRequestException("Error: bad request", 400);
         } else {
             if (req.playerColor().equals("WHITE")) {
                 if (game.whiteUsername() != null) {
-                    //
+                    throw new TakenException("Error: already taken", 403);
                 }
 
                 String username = authAccess.getUsername(req.authToken());
@@ -52,7 +51,7 @@ public class GameService {
 
             } else if (req.playerColor().equals("BLACK")) {
                 if (game.blackUsername() != null) {
-                    //
+                    throw new TakenException("Error: already taken", 403);
                 }
 
                 String username = authAccess.getUsername(req.authToken());
@@ -60,22 +59,21 @@ public class GameService {
                 return new JoinResult();
 
             } else {
-                //
+                throw new BadRequestException("Error: bad request", 400);
             }
         }
-
-        return new JoinResult();
     }
 
-    public ListResult list(ListRequest req) throws DataAccessException {
-        AuthMemoryDataAccess authAccess = new AuthMemoryDataAccess();
-
-        if (!authAccess.validateAuth(req.authToken())) {
-            //
+    public ListResult list(ListRequest req) throws DataAccessException, UnauthorizedException {
+        if (authAccess.validateAuth(req.authToken())) {
+            throw new UnauthorizedException("Error: unauthorized", 401);
         }
 
-        GameMemoryDataAccess gameAccess = new GameMemoryDataAccess();
         Collection<GameInfo> games = gameAccess.listGames();
         return new ListResult(games);
+    }
+
+    public GameDAO getGameAccess() {
+        return gameAccess;
     }
 }

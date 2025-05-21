@@ -13,13 +13,7 @@ public class AuthMemoryDataAccess implements AuthDAO {
         AuthData auth = new AuthData(token, username);
         auths.put(token, auth);
         return auth;
-        // add said data to database
-        // UUID.randomUUID().toString()
     }
-
-//    public AuthData getAuth(String username) throws DataAccessException {
-//        return auths.get(username);
-//    }
 
     public void deleteAuth(String authToken) throws DataAccessException {
         auths.remove(authToken);
@@ -30,7 +24,12 @@ public class AuthMemoryDataAccess implements AuthDAO {
     }
 
     public boolean validateAuth(String authToken) throws DataAccessException {
-        return auths.containsKey(authToken);
+//        System.out.println("Here's the token: " + authToken);
+//        System.out.println("Here's all the tokens:");
+//        for (String key : auths.keySet()) {
+//            System.out.println(auths.get(key));
+//        }
+        return !auths.containsKey(authToken);
     }
 
     public String getUsername(String authToken) throws DataAccessException {

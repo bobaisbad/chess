@@ -8,7 +8,7 @@ public class BaseService {
     public void validate(String authToken) throws DataAccessException {
         AuthMemoryDataAccess authAccess = new AuthMemoryDataAccess();
 
-        if (!authAccess.validateAuth(authToken)) {
+        if (authAccess.validateAuth(authToken)) {
             //
         }
     }

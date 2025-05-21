@@ -1,17 +1,19 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.GameMemoryDataAccess;
-import dataaccess.UserMemoryDataAccess;
-import dataaccess.AuthMemoryDataAccess;
+import dataaccess.*;
 
 public class ClearService {
+    private final AuthDAO authAccess;
+    private final GameDAO gameAccess;
+    private final UserDAO userAccess;
+
+    public ClearService(AuthDAO authAccess, GameDAO gameAccess, UserDAO userAccess) {
+        this.authAccess = authAccess;
+        this.gameAccess = gameAccess;
+        this.userAccess = userAccess;
+    }
 
     public void clearAllData() throws DataAccessException {
-        UserMemoryDataAccess userAccess = new UserMemoryDataAccess();
-        GameMemoryDataAccess gameAccess = new GameMemoryDataAccess();
-        AuthMemoryDataAccess authAccess = new AuthMemoryDataAccess();
-
         userAccess.deleteAllUsers();
         gameAccess.deleteAllGames();
         authAccess.deleteAllAuth();

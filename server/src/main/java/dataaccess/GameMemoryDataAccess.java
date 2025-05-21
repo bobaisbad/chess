@@ -4,7 +4,6 @@ import chess.ChessGame;
 import model.GameData;
 import model.GameInfo;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +12,7 @@ public class GameMemoryDataAccess implements GameDAO {
     private final HashMap<Integer, GameData> games = new HashMap<>();
     private int gameCount = 0;
 
-    public int createGame(String gameName) throws DataAccessException {
+    public int createGame(String gameName) {
         gameCount++;
         ChessGame game = new ChessGame();
         GameData data = new GameData(gameCount, null, null, gameName, game);
@@ -21,11 +20,11 @@ public class GameMemoryDataAccess implements GameDAO {
         return gameCount;
     }
 
-    public GameData getGame(int gameID) throws DataAccessException {
+    public GameData getGame(int gameID) {
         return games.get(gameID);
     }
 
-    public Collection<GameInfo> listGames() throws DataAccessException {
+    public Collection<GameInfo> listGames() {
         HashSet<GameInfo> info = new HashSet<>();
         GameData data;
 
@@ -36,7 +35,7 @@ public class GameMemoryDataAccess implements GameDAO {
         return info;
     }
 
-    public void updateGame(GameData game, String playerColor, String username) throws DataAccessException {
+    public void updateGame(GameData game, String playerColor, String username) {
         if (playerColor.equals("WHITE")) {
             games.put(game.gameID(), new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game()));
         } else {
@@ -44,11 +43,11 @@ public class GameMemoryDataAccess implements GameDAO {
         }
     }
 
-    public void deleteGame(int gameID) throws DataAccessException {
+    public void deleteGame(int gameID) {
         games.remove(gameID);
     }
 
-    public void deleteAllGames() throws DataAccessException {
+    public void deleteAllGames() {
         games.clear();
     }
 }

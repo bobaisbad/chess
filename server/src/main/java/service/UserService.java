@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.AuthMemoryDataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.UserMemoryDataAccess;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import request.LoginRequest;
@@ -14,44 +11,49 @@ import result.LogoutResult;
 import result.RegisterResult;
 
 public class UserService {
+    private final UserDAO userAccess = new UserMemoryDataAccess();
+//    private final AuthDAO authAccess = new AuthMemoryDataAccess();
+    private final AuthDAO authAccess;
 
-    public LoginResult login(LoginRequest req) throws DataAccessException {
-        UserDAO userAccess = new UserMemoryDataAccess();
+    public UserService(AuthDAO authAccess) {
+        this.authAccess = authAccess;
+    }
+
+    public LoginResult login(LoginRequest req) throws DataAccessException, BadRequestException {
         UserData user = userAccess.getUser(req.username());
 
-        if (user == null) {
-            //
-        } else if (!user.password().equals(req.password())) {
-            //
+        if (user == null || !user.password().equals(req.password())) {
+            throw new BadRequestException("Error: bad request", 400);
         }
 
-        AuthMemoryDataAccess authAccess = new AuthMemoryDataAccess();
         AuthData auth = authAccess.createAuth(req.username());
         return new LoginResult(auth.username(), auth.authToken());
     }
 
-    public LogoutResult logout(LogoutRequest req) throws DataAccessException {
-        AuthMemoryDataAccess authAccess = new AuthMemoryDataAccess();
-
-        if (!authAccess.validateAuth(req.authToken())) {
-            //
+    public LogoutResult logout(LogoutRequest req) throws DataAccessException, UnauthorizedException {
+        if (authAccess.validateAuth(req.authToken())) {
+            throw new UnauthorizedException("Error: unauthorized", 401);
         }
 
         authAccess.deleteAuth(req.authToken());
         return new LogoutResult();
     }
 
-    public RegisterResult register(RegisterRequest req) throws DataAccessException {
-        UserDAO userAccess = new UserMemoryDataAccess();
+    public RegisterResult register(RegisterRequest req) throws DataAccessException, TakenException, BadRequestException {
         UserData user = userAccess.getUser(req.username());
 
         if (user != null) {
-            //
+            throw new TakenException("Error: already taken", 403);
+        } else if (req.username() == null || req.password() == null || req.email() == null) {
+            throw new BadRequestException("Error: bad request", 400);
         }
 
         userAccess.createUser(req);
-        AuthMemoryDataAccess authAccess = new AuthMemoryDataAccess();
         AuthData auth = authAccess.createAuth(req.username());
         return new RegisterResult(auth.username(), auth.authToken());
+    }
+
+    public UserDAO getUserAccess() {
+        return userAccess;
     }
 }
