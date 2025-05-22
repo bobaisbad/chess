@@ -47,11 +47,9 @@ public class PieceMovesCalculator {
                     newPosition.setCol(moves[i + 1][j]);
                     ChessPiece newPiece = board.getPiece(newPosition);
 
-                    if (newPiece == null || newPiece.getTeamColor() != piece.getTeamColor()) {
-                        movesArray.add(new ChessMove(myPosition, new ChessPosition(moves[i][j], moves[i + 1][j]), null));
+                    boolean result = checkPosition(newPiece, moves, i, j, movesArray);
 
-                        if (newPiece != null && newPiece.getTeamColor() != piece.getTeamColor()) {break;}
-                    } else {
+                    if (result) {
                         break;
                     }
                 }
@@ -59,5 +57,19 @@ public class PieceMovesCalculator {
         }
 
         return movesArray;
+    }
+
+    private boolean checkPosition(ChessPiece newPiece, int[][] moves, int i, int j, ArrayList<ChessMove> movesArray) {
+        if (newPiece == null || newPiece.getTeamColor() != piece.getTeamColor()) {
+            movesArray.add(new ChessMove(myPosition, new ChessPosition(moves[i][j], moves[i + 1][j]), null));
+
+            if (newPiece != null && newPiece.getTeamColor() != piece.getTeamColor()) {
+                return true;
+            }
+        } else {
+            return true;
+        }
+
+        return false;
     }
 }

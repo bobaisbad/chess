@@ -11,7 +11,8 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         this.board = board;
     }
 
-    private ArrayList<ChessMove> movement(int start, int otherStart, String direction, ChessPosition newPosition, ChessPosition myPosition, ArrayList<ChessMove> movesArray) {
+    private ArrayList<ChessMove> movement(int start, int otherStart, String direction, ChessPosition newPosition,
+                                          ChessPosition myPosition, ArrayList<ChessMove> movesArray) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
 
@@ -59,7 +60,8 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         return movesArray;
     }
 
-    private ArrayList<ChessMove> attacks(int otherStart, int[][] moves, ChessPosition newPosition, ChessPosition myPosition, ChessPiece piece, ArrayList<ChessMove> movesArray) {
+    private ArrayList<ChessMove> attacks(int otherStart, int[][] moves, ChessPosition newPosition,
+                                         ChessPosition myPosition, ChessPiece piece, ArrayList<ChessMove> movesArray) {
         int row = myPosition.getRow();
 
         for (int i = 0; i < 2; i++) {
@@ -106,7 +108,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
                     {row - 1, row - 1},
                     {col - 1, col + 1}
             };
-            
+
             movesArray = attacks(2, moves, newPosition, myPosition, piece, movesArray);
         }
 
