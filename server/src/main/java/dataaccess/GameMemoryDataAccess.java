@@ -43,10 +43,6 @@ public class GameMemoryDataAccess implements GameDAO {
         }
     }
 
-    public void deleteGame(int gameID) {
-        games.remove(gameID);
-    }
-
     public void deleteAllGames() {
         games.clear();
     }

@@ -50,9 +50,7 @@ public class PieceMovesCalculator {
                     if (newPiece == null || newPiece.getTeamColor() != piece.getTeamColor()) {
                         movesArray.add(new ChessMove(myPosition, new ChessPosition(moves[i][j], moves[i + 1][j]), null));
 
-                        if (newPiece != null && newPiece.getTeamColor() != piece.getTeamColor()) {
-                            break;
-                        }
+                        if (newPiece != null && newPiece.getTeamColor() != piece.getTeamColor()) {break;}
                     } else {
                         break;
                     }

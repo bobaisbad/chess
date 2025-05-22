@@ -41,7 +41,7 @@ public class Server {
     }
 
     private void exceptionHandler(ParentException ex, Request req, Response res) {
-        res.status(ex.StatusCode());
+        res.status(ex.statusCode());
         ExceptionInfo info = new ExceptionInfo(ex.getMessage());
         res.body(new Gson().toJson(info));
     }

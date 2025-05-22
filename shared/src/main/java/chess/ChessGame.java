@@ -152,14 +152,24 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> moves = piece.pieceMoves(board, position);
 
-                    for (ChessMove move : moves) {
-                        if (teamColor == TeamColor.WHITE && move.getEndPosition().equals(whiteKingPosition)) {
-                            return true;
-                        } else if (teamColor == TeamColor.BLACK && move.getEndPosition().equals(blackKingPosition)) {
-                            return true;
-                        }
+                    boolean result = checkMoves(teamColor, moves);
+
+                    if (result) {
+                        return true;
                     }
                 }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean checkMoves(TeamColor teamColor, Collection<ChessMove> moves) {
+        for (ChessMove move : moves) {
+            if (teamColor == TeamColor.WHITE && move.getEndPosition().equals(whiteKingPosition)) {
+                return true;
+            } else if (teamColor == TeamColor.BLACK && move.getEndPosition().equals(blackKingPosition)) {
+                return true;
             }
         }
 

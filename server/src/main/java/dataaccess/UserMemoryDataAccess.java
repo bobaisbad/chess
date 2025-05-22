@@ -13,10 +13,6 @@ public class UserMemoryDataAccess implements UserDAO {
         users.put(user.username(), user);
     }
 
-    public void deleteUser(UserData userData) {
-        //
-    }
-
     public void deleteAllUsers() {
         users.clear();
     }
