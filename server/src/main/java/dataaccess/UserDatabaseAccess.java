@@ -4,6 +4,7 @@ import Exceptions.DataAccessException;
 import model.GameInfo;
 import model.UserData;
 import org.eclipse.jetty.server.Authentication;
+import org.mindrot.jbcrypt.BCrypt;
 import request.RegisterRequest;
 
 import java.sql.*;
@@ -12,21 +13,24 @@ import java.util.List;
 
 public class UserDatabaseAccess implements UserDAO {
 
-    public void createUser(RegisterRequest req) {
-        // var stmt = "INSERT INTO chess ("
-        // UserData user = new UserData(req.username(), req.password(), req.email());
-        // users.put(user.username(), user);
+    public void createUser(RegisterRequest req) throws DataAccessException {
+        var stmt = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        String hashedPassword = BCrypt.hashpw(req.password(), BCrypt.gensalt());
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setString(1, req.username());
+                prepStmt.setString(2, hashedPassword);
+                prepStmt.setString(3, req.email());
+
+                prepStmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: failed to insert new user", 500);
+        }
     }
 
     public void deleteAllUsers() throws DataAccessException {
-//        var stmt = "DROP TABLE IF EXISTS users";
-//        try (Connection conn = DatabaseManager.getConnection()) {
-//            try (var prepStmt = conn.prepareStatement(stmt)) {
-//                prepStmt.executeUpdate();
-//            }
-//        } catch (SQLException ex) {
-//            throw new DataAccessException("Error: unable to drop table", 500);
-//        }
         DatabaseManager.deleteTable("users");
     }
 

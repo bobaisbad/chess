@@ -43,7 +43,7 @@ public class DatabaseManager {
                 prepStmt.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: unable to drop table", 500);
+            throw new DataAccessException("Error: failed to drop table", 500);
         }
     }
 
@@ -84,7 +84,7 @@ public class DatabaseManager {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: unable to configure database", 500);
+            throw new DataAccessException("Error: failed to configure database", 500);
         }
     }
 
