@@ -51,7 +51,7 @@ public class UserDatabaseAccess implements UserDAO {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: ", 500);
+            throw new DataAccessException("Error: failed to retrieve user", 500);
         }
     }
 

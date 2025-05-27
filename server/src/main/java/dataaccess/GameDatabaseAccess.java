@@ -2,25 +2,52 @@ package dataaccess;
 
 import Exceptions.DataAccessException;
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.GameData;
 import model.GameInfo;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.sql.Types.NULL;
+
 public class GameDatabaseAccess implements GameDAO {
 
-    private int gameCount = 0;
+    public int createGame(String gameName) throws DataAccessException {
+        var stmt = "INSERT INTO games (whiteUsername, blackUsername, gameName, game)" +
+                   "VALUES (?, ?, ?, ?)";
+        var jsonGame = new Gson().toJson(new ChessGame());
 
-    public int createGame(String gameName) {
-        gameCount++;
-        ChessGame game = new ChessGame();
-        GameData data = new GameData(gameCount, null, null, gameName, game);
-        // games.put(gameCount, data);
-        return gameCount;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt, RETURN_GENERATED_KEYS)) {
+                prepStmt.setNull(1, NULL);
+                prepStmt.setNull(2, NULL);
+                prepStmt.setString(3, gameName);
+                prepStmt.setString(4, jsonGame);
+
+                prepStmt.executeUpdate();
+
+                ResultSet result = prepStmt.getGeneratedKeys();
+                if (result.next()) {
+                    return result.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: failed to insert new game", 500);
+        }
     }
+
+//    try (Connection conn = DatabaseManager.getConnection()) {
+//
+//        } catch (SQLException ex) {
+//            throw new DataAccessException("Error: ", 500)
+//        }
 
     public GameData getGame(int gameID) {
         return new GameData(1, "sup", "sup", "sup", null); // games.get(gameID);
