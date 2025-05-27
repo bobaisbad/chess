@@ -43,9 +43,9 @@ public class UserDatabaseAccess implements UserDAO {
                 prepStmt.setString(1, username);
                 try (ResultSet result = prepStmt.executeQuery()) {
                     result.next();
-                    username = result.getString(1);
-                    String password = result.getString(2);
-                    String email = result.getString(3);
+                    username = result.getString("username");
+                    String password = result.getString("password");
+                    String email = result.getString("email");
 
                     return new UserData(username, password, email);
                 }

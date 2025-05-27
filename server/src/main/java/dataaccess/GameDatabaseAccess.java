@@ -5,6 +5,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 import model.GameInfo;
+import model.UserData;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -18,14 +19,14 @@ import static java.sql.Types.NULL;
 public class GameDatabaseAccess implements GameDAO {
 
     public int createGame(String gameName) throws DataAccessException {
-        var stmt = "INSERT INTO games (whiteUsername, blackUsername, gameName, game)" +
+        var stmt = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) " +
                    "VALUES (?, ?, ?, ?)";
         var jsonGame = new Gson().toJson(new ChessGame());
 
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var prepStmt = conn.prepareStatement(stmt, RETURN_GENERATED_KEYS)) {
-                prepStmt.setNull(1, NULL);
-                prepStmt.setNull(2, NULL);
+                prepStmt.setString(1, null);
+                prepStmt.setString(2, null);
                 prepStmt.setString(3, gameName);
                 prepStmt.setString(4, jsonGame);
 
@@ -49,8 +50,28 @@ public class GameDatabaseAccess implements GameDAO {
 //            throw new DataAccessException("Error: ", 500)
 //        }
 
-    public GameData getGame(int gameID) {
-        return new GameData(1, "sup", "sup", "sup", null); // games.get(gameID);
+    public GameData getGame(int gameID) throws DataAccessException {
+        String stmt = "SELECT gameID, whiteUsername, blackUsername, gameName, game " +
+                      "FROM games " +
+                      "WHERE gameID=?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setInt(1, gameID);
+                try (ResultSet result = prepStmt.executeQuery()) {
+                    result.next();
+                    gameID = result.getInt("gameID");
+                    String whiteUsername = result.getString("whiteUsername");
+                    String blackUsername = result.getString("blackUsername");
+                    String gameName = result.getString("gameName");
+                    ChessGame game = new Gson().fromJson(result.getString("game"), ChessGame.class);
+
+                    return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: failed to retrieve user", 500);
+        }
     }
 
     public Collection<GameInfo> listGames() {
