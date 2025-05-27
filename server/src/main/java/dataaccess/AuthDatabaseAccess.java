@@ -1,15 +1,11 @@
 package dataaccess;
 
+import Exceptions.DataAccessException;
 import model.AuthData;
 
 import java.util.UUID;
 
 public class AuthDatabaseAccess implements AuthDAO {
-    DatabaseManager manager;
-
-    public AuthDatabaseAccess(DatabaseManager manager) {
-        this.manager = manager;
-    }
 
     public AuthData createAuth(String username) {
         String token = UUID.randomUUID().toString();

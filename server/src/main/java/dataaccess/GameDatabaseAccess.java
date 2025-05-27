@@ -1,5 +1,6 @@
 package dataaccess;
 
+import Exceptions.DataAccessException;
 import chess.ChessGame;
 import model.GameData;
 import model.GameInfo;
@@ -8,11 +9,6 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public class GameDatabaseAccess implements GameDAO {
-    DatabaseManager manager;
-
-    public GameDatabaseAccess(DatabaseManager manager) {
-        this.manager = manager;
-    }
 
     private int gameCount = 0;
 

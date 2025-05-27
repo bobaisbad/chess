@@ -10,14 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDatabaseAccess implements UserDAO {
-    DatabaseManager manager;
-
-    public UserDatabaseAccess(DatabaseManager manager) {
-        this.manager = manager;
-    }
 
     public void createUser(RegisterRequest req) {
-        UserData user = new UserData(req.username(), req.password(), req.email());
+        // var stmt = "INSERT INTO chess ("
+        // UserData user = new UserData(req.username(), req.password(), req.email());
         // users.put(user.username(), user);
     }
 

@@ -1,9 +1,6 @@
 package service;
 
-import Exceptions.BadRequestException;
-import Exceptions.ParentException;
-import Exceptions.TakenException;
-import Exceptions.UnauthorizedException;
+import Exceptions.*;
 import dataaccess.*;
 import model.GameInfo;
 import model.UserData;
@@ -24,26 +21,26 @@ public class ServiceTests {
 //    final GameService gameService = new GameService(authAccess);
 //    final ClearService clearService = new ClearService(authAccess, gameService.getGameAccess(), userService.getUserAccess());
 
-    private final AuthDAO authAccess;
-    private final UserDAO userAccess;
-    private final GameDAO gameAccess;
     private final UserService userService; // = new UserService(authAccess, userAccess);
     private final GameService gameService; // = new GameService(authAccess, gameAccess);
     private final ClearService clearService;
 
-    public ServiceTests() {
+    public ServiceTests() throws DataAccessException {
         String service = "memory";
 
-        if (service.equals("db")) {
-            DatabaseManager manager = new DatabaseManager();
+        new DatabaseManager();
+        AuthDAO authAccess;
+        UserDAO userAccess;
+        GameDAO gameAccess;
 
-            this.authAccess = new AuthDatabaseAccess(manager);
-            this.userAccess = new UserDatabaseAccess(manager);
-            this.gameAccess = new GameDatabaseAccess(manager);
+        if (service.equals("db")) {
+            authAccess = new AuthDatabaseAccess();
+            userAccess = new UserDatabaseAccess();
+            gameAccess = new GameDatabaseAccess();
         } else {
-            this.authAccess = new AuthMemoryDataAccess();
-            this.userAccess = new UserMemoryDataAccess();
-            this.gameAccess = new GameMemoryDataAccess();
+            authAccess = new AuthMemoryDataAccess();
+            userAccess = new UserMemoryDataAccess();
+            gameAccess = new GameMemoryDataAccess();
         }
 
         this.userService = new UserService(authAccess, userAccess);

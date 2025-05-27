@@ -18,6 +18,10 @@ public class DatabaseManager {
         loadPropertiesFromResources();
     }
 
+    public DatabaseManager() throws DataAccessException {
+        configureDatabase();
+    }
+
     /**
      * Creates the database if it does not already exist.
      */
@@ -30,6 +34,47 @@ public class DatabaseManager {
             throw new DataAccessException("Error: failed to create database", ex.getErrorCode());
         }
     }
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var stmt : createStatements) {
+                try (var prepStmt = conn.prepareStatement(stmt)) {
+                    prepStmt.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: unable to configure database", 500);
+        }
+    }
+
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS users (
+              'username' CHAR NOT NULL,
+              'password' CHAR NOT NULL,
+              'email' CHAR NOT NULL,
+              PRIMARY KEY (username)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS games (
+              'gameID' INT NOT NULL AUTO_INCREMENT,
+              'whiteUsername' CHAR DEFAULT NULL,
+              'blackUsername' CHAR DEFAULT NULL,
+              'gameName' CHAR NOT NULL,
+              'game' TEXT NOT NULL,
+              PRIMARY KEY (gameID)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS auths (
+              'authToken' CHAR NOT NULL,
+              'username' CHAR NOT NULL,
+              PRIMARY KEY (authToken)
+            );
+            """
+    };
 
     /**
      * Create a connection to the database and sets the catalog based upon the
