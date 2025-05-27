@@ -14,10 +14,30 @@ import com.google.gson.Gson;
 
 public class Server {
     // private final AuthDAO authAccess = new AuthMemoryDataAccess();
-    private final AuthDAO authAccess = new AuthDatabaseAccess();
-    private final UserService userService = new UserService(authAccess);
-    private final GameService gameService = new GameService(authAccess);
-    private final ClearService clearService = new ClearService(authAccess, gameService.getGameAccess(), userService.getUserAccess());
+    private final AuthDAO authAccess;
+    private final UserDAO userAccess;
+    private final GameDAO gameAccess;
+    private final UserService userService; // = new UserService(authAccess, userAccess);
+    private final GameService gameService; // = new GameService(authAccess, gameAccess);
+    private final ClearService clearService; // = new ClearService(authAccess, gameService.getGameAccess(), userService.getUserAccess());
+
+    public Server(String service) {
+        if (service.equals("db")) {
+            DatabaseManager manager = new DatabaseManager();
+
+            this.authAccess = new AuthDatabaseAccess(manager);
+            this.userAccess = new UserDatabaseAccess(manager);
+            this.gameAccess = new GameDatabaseAccess(manager);
+        } else {
+            this.authAccess = new AuthMemoryDataAccess();
+            this.userAccess = new UserMemoryDataAccess();
+            this.gameAccess = new GameMemoryDataAccess();
+        }
+
+        this.userService = new UserService(authAccess, userAccess);
+        this.gameService = new GameService(authAccess, gameAccess);
+        this.clearService = new ClearService(authAccess, gameAccess, userAccess);
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

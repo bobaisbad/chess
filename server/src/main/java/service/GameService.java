@@ -18,10 +18,11 @@ import java.util.Collection;
 
 public class GameService {
     // private final GameDAO gameAccess = new GameMemoryDataAccess();
-    private final GameDAO gameAccess = new GameDatabaseAccess();
+    private final GameDAO gameAccess;
     private final AuthDAO authAccess;
 
-    public GameService(AuthDAO authAccess) {
+    public GameService(AuthDAO authAccess, GameDAO gameAccess) {
+        this.gameAccess = gameAccess;
         this.authAccess = authAccess;
     }
 

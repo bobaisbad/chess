@@ -1,5 +1,9 @@
 package service;
 
+import Exceptions.BadRequestException;
+import Exceptions.ParentException;
+import Exceptions.TakenException;
+import Exceptions.UnauthorizedException;
 import dataaccess.*;
 import model.GameInfo;
 import model.UserData;
@@ -7,16 +11,45 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.*;
 import result.*;
+import server.Server;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ServiceTests {
-    final AuthDAO authAccess = new AuthMemoryDataAccess();
-    final UserService userService = new UserService(authAccess);
-    final GameService gameService = new GameService(authAccess);
-    final ClearService clearService = new ClearService(authAccess, gameService.getGameAccess(), userService.getUserAccess());
+    // final AuthDAO authAccess = new AuthMemoryDataAccess();
+//    final AuthDAO authAccess = new AuthDatabaseAccess();
+//    final UserService userService = new UserService(authAccess);
+//    final GameService gameService = new GameService(authAccess);
+//    final ClearService clearService = new ClearService(authAccess, gameService.getGameAccess(), userService.getUserAccess());
+
+    private final AuthDAO authAccess;
+    private final UserDAO userAccess;
+    private final GameDAO gameAccess;
+    private final UserService userService; // = new UserService(authAccess, userAccess);
+    private final GameService gameService; // = new GameService(authAccess, gameAccess);
+    private final ClearService clearService;
+
+    public ServiceTests() {
+        String service = "memory";
+
+        if (service.equals("db")) {
+            DatabaseManager manager = new DatabaseManager();
+
+            this.authAccess = new AuthDatabaseAccess(manager);
+            this.userAccess = new UserDatabaseAccess(manager);
+            this.gameAccess = new GameDatabaseAccess(manager);
+        } else {
+            this.authAccess = new AuthMemoryDataAccess();
+            this.userAccess = new UserMemoryDataAccess();
+            this.gameAccess = new GameMemoryDataAccess();
+        }
+
+        this.userService = new UserService(authAccess, userAccess);
+        this.gameService = new GameService(authAccess, gameAccess);
+        this.clearService = new ClearService(authAccess, gameAccess, userAccess);
+    }
 
     @BeforeEach
     void clearAll() throws ParentException {

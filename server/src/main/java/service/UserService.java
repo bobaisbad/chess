@@ -16,10 +16,11 @@ import result.RegisterResult;
 
 public class UserService {
     // private final UserDAO userAccess = new UserMemoryDataAccess();
-    private final UserDAO userAccess = new UserDatabaseAccess();
+    private final UserDAO userAccess;
     private final AuthDAO authAccess;
 
-    public UserService(AuthDAO authAccess) {
+    public UserService(AuthDAO authAccess, UserDAO userAccess) {
+        this.userAccess = userAccess;
         this.authAccess = authAccess;
     }
 
