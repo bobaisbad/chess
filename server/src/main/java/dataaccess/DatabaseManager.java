@@ -25,7 +25,7 @@ public class DatabaseManager {
     /**
      * Creates the database if it does not already exist.
      */
-    static public void createDatabase() throws DataAccessException {
+    static private void createDatabase() throws DataAccessException {
         var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
         try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
              var preparedStatement = conn.prepareStatement(statement)) {
@@ -35,16 +35,15 @@ public class DatabaseManager {
         }
     }
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var stmt : createStatements) {
-                try (var prepStmt = conn.prepareStatement(stmt)) {
-                    prepStmt.executeUpdate();
-                }
+    static public void deleteTable(String table) throws DataAccessException {
+        var stmt = "DROP TABLE IF EXISTS ?";
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setString(1, table);
+                prepStmt.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: unable to configure database", 500);
+            throw new DataAccessException("Error: unable to drop table", 500);
         }
     }
 
@@ -75,6 +74,19 @@ public class DatabaseManager {
             );
             """
     };
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var stmt : createStatements) {
+                try (var prepStmt = conn.prepareStatement(stmt)) {
+                    prepStmt.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: unable to configure database", 500);
+        }
+    }
 
     /**
      * Create a connection to the database and sets the catalog based upon the

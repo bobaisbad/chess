@@ -1,5 +1,6 @@
 package dataaccess;
 
+import Exceptions.DataAccessException;
 import model.GameInfo;
 import model.UserData;
 import org.eclipse.jetty.server.Authentication;
@@ -17,8 +18,16 @@ public class UserDatabaseAccess implements UserDAO {
         // users.put(user.username(), user);
     }
 
-    public void deleteAllUsers() {
-        // users.clear();
+    public void deleteAllUsers() throws DataAccessException {
+//        var stmt = "DROP TABLE IF EXISTS users";
+//        try (Connection conn = DatabaseManager.getConnection()) {
+//            try (var prepStmt = conn.prepareStatement(stmt)) {
+//                prepStmt.executeUpdate();
+//            }
+//        } catch (SQLException ex) {
+//            throw new DataAccessException("Error: unable to drop table", 500);
+//        }
+        DatabaseManager.deleteTable("users");
     }
 
     public UserData getUser(String username) {

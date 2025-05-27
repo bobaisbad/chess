@@ -5,6 +5,8 @@ import chess.ChessGame;
 import model.GameData;
 import model.GameInfo;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -43,7 +45,15 @@ public class GameDatabaseAccess implements GameDAO {
         }
     }
 
-    public void deleteAllGames() {
-        // games.clear();
+    public void deleteAllGames() throws DataAccessException {
+//        var stmt = "DROP TABLE IF EXISTS games";
+//        try (Connection conn = DatabaseManager.getConnection()) {
+//            try (var prepStmt = conn.prepareStatement(stmt)) {
+//                prepStmt.executeUpdate();
+//            }
+//        } catch (SQLException ex) {
+//            throw new DataAccessException("Error: unable to drop table", 500);
+//        }
+        DatabaseManager.deleteTable("games");
     }
 }

@@ -1,4 +1,5 @@
 import Exceptions.DataAccessException;
+import Exceptions.ParentException;
 import chess.*;
 import server.Server;
 
@@ -10,7 +11,7 @@ public class Main {
 
             var server = new Server("memory");
             server.run(8080);
-        } catch (Exception ex) {
+        } catch (ParentException ex) {
             System.out.printf("Unable to start server: %s%n", ex.getMessage());
         }
     }
