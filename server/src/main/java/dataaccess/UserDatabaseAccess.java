@@ -7,6 +7,7 @@ import org.eclipse.jetty.server.Authentication;
 import org.mindrot.jbcrypt.BCrypt;
 import request.RegisterRequest;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,32 @@ public class UserDatabaseAccess implements UserDAO {
         DatabaseManager.deleteTable("users");
     }
 
-    public UserData getUser(String username) {
-        return new UserData("sup", "pass", "gmail"); // users.get(username);
+    public UserData getUser(String username) throws DataAccessException {
+        String stmt = "SELECT username, password, email FROM users WHERE username=?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setString(1, username);
+                try (ResultSet result = prepStmt.executeQuery()) {
+                    result.next();
+                    username = result.getString(1);
+                    String password = result.getString(2);
+                    String email = result.getString(3);
+
+                    return new UserData(username, password, email);
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: ", 500);
+        }
     }
+
+//    try (Connection conn = DatabaseManager.getConnection()) {
+//
+//    } catch (SQLException ex) {
+//        throw new DataAccessException("Error: ", 500)
+//    }
+
 }
 
 //    public List<GameInfo> test() {

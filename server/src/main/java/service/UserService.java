@@ -7,6 +7,7 @@ import Exceptions.UnauthorizedException;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -29,7 +30,7 @@ public class UserService {
 
         if (req.password() == null || req.username() == null) {
             throw new BadRequestException("Error: bad request", 400);
-        } else if (user == null || !user.password().equals(req.password())) {
+        } else if (user == null || !BCrypt.checkpw(req.password(), user.password())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
         }
 
