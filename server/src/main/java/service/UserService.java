@@ -1,5 +1,9 @@
 package service;
 
+import Exceptions.BadRequestException;
+import Exceptions.ParentException;
+import Exceptions.TakenException;
+import Exceptions.UnauthorizedException;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
@@ -11,7 +15,8 @@ import result.LogoutResult;
 import result.RegisterResult;
 
 public class UserService {
-    private final UserDAO userAccess = new UserMemoryDataAccess();
+    // private final UserDAO userAccess = new UserMemoryDataAccess();
+    private final UserDAO userAccess = new UserDatabaseAccess();
     private final AuthDAO authAccess;
 
     public UserService(AuthDAO authAccess) {

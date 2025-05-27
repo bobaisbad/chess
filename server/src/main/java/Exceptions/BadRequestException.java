@@ -1,4 +1,4 @@
-package dataaccess;
+package Exceptions;
 
 public class BadRequestException extends ParentException {
     public BadRequestException(String message, int statusCode) {

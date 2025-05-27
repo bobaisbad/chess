@@ -1,4 +1,4 @@
-package dataaccess;
+package Exceptions;
 
 public class TakenException extends ParentException {
     public TakenException(String message, int statusCode) {

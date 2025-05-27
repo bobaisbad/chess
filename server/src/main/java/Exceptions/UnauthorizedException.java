@@ -1,4 +1,4 @@
-package dataaccess;
+package Exceptions;
 
 public class UnauthorizedException extends ParentException {
     public UnauthorizedException(String message, int statusCode) {

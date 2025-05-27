@@ -1,5 +1,9 @@
 package server;
 
+import Exceptions.BadRequestException;
+import Exceptions.ParentException;
+import Exceptions.TakenException;
+import Exceptions.UnauthorizedException;
 import dataaccess.*;
 import model.ExceptionInfo;
 import request.*;
@@ -9,7 +13,8 @@ import spark.*;
 import com.google.gson.Gson;
 
 public class Server {
-    private final AuthDAO authAccess = new AuthMemoryDataAccess();
+    // private final AuthDAO authAccess = new AuthMemoryDataAccess();
+    private final AuthDAO authAccess = new AuthDatabaseAccess();
     private final UserService userService = new UserService(authAccess);
     private final GameService gameService = new GameService(authAccess);
     private final ClearService clearService = new ClearService(authAccess, gameService.getGameAccess(), userService.getUserAccess());

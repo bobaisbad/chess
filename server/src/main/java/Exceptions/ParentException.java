@@ -1,4 +1,4 @@
-package dataaccess;
+package Exceptions;
 
 public class ParentException extends Exception {
     private final int statusCode;

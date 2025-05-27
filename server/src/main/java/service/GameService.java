@@ -1,5 +1,9 @@
 package service;
 
+import Exceptions.BadRequestException;
+import Exceptions.ParentException;
+import Exceptions.TakenException;
+import Exceptions.UnauthorizedException;
 import dataaccess.*;
 import model.GameData;
 import model.GameInfo;
@@ -13,7 +17,8 @@ import result.ListResult;
 import java.util.Collection;
 
 public class GameService {
-    private final GameDAO gameAccess = new GameMemoryDataAccess();
+    // private final GameDAO gameAccess = new GameMemoryDataAccess();
+    private final GameDAO gameAccess = new GameDatabaseAccess();
     private final AuthDAO authAccess;
 
     public GameService(AuthDAO authAccess) {
