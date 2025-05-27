@@ -7,6 +7,7 @@ import model.GameData;
 import model.GameInfo;
 import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -74,15 +75,28 @@ public class GameDatabaseAccess implements GameDAO {
         }
     }
 
-    public Collection<GameInfo> listGames() {
+    public Collection<GameInfo> listGames() throws DataAccessException {
+        String stmt = "SELECT gameID, whiteUsername, blackUsername, gameName " +
+                      "FROM games";
         HashSet<GameInfo> info = new HashSet<>();
-        GameData data;
 
-//        for (int key : games.keySet()) {
-//            data = games.get(key);
-//            info.add(new GameInfo(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName()));
-//        }
-        return info;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                try (ResultSet result = prepStmt.executeQuery()) {
+                    while (result.next()) {
+                        int gameID = result.getInt("gameID");
+                        String whiteUsername = result.getString("whiteUsername");
+                        String blackUsername = result.getString("blackUsername");
+                        String gameName = result.getString("gameName");
+                        info.add(new GameInfo(gameID, whiteUsername, blackUsername, gameName));
+                    }
+
+                    return info;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: ", 500);
+        }
     }
 
     public void updateGame(GameData game, String playerColor, String username) {
