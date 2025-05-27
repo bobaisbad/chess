@@ -36,7 +36,7 @@ public class DatabaseManager {
     }
 
     static public void deleteTable(String table) throws DataAccessException {
-        var stmt = "DROP TABLE IF EXISTS ?";
+        var stmt = "TRUNCATE TABLE IF EXISTS ?";
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var prepStmt = conn.prepareStatement(stmt)) {
                 prepStmt.setString(1, table);

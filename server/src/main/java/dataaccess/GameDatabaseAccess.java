@@ -99,11 +99,30 @@ public class GameDatabaseAccess implements GameDAO {
         }
     }
 
-    public void updateGame(GameData game, String playerColor, String username) {
+    public void updateGame(GameData game, String playerColor, String username) throws DataAccessException {
+        String whiteUsername = game.whiteUsername();
+        String blackUsername = game.blackUsername();
+
         if (playerColor.equals("WHITE")) {
-            // games.put(game.gameID(), new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game()));
+            whiteUsername = username;
         } else {
-            // games.put(game.gameID(), new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game()));
+            blackUsername = username;
+        }
+
+         String stmt = "UPDATE games " +
+                       "SET whiteUsername = ?, blackUsername = ? " +
+                       "WHERE gameID = ?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setString(1, whiteUsername);
+                prepStmt.setString(2, blackUsername);
+                prepStmt.setInt(3, game.gameID());
+
+                prepStmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: ", 500);
         }
     }
 
