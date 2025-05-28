@@ -17,8 +17,7 @@ public class ServiceMemoryTests {
     private final GameService gameService;
     private final ClearService clearService;
 
-    public ServiceMemoryTests() throws DataAccessException {
-        new DatabaseManager();
+    public ServiceMemoryTests() {
         AuthDAO authAccess = new AuthMemoryDataAccess();
         UserDAO userAccess = new UserMemoryDataAccess();
         GameDAO gameAccess = new GameMemoryDataAccess();

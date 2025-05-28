@@ -18,8 +18,7 @@ public class ServiceDatabaseTests {
     private final GameService gameService;
     private final ClearService clearService;
 
-    public ServiceDatabaseTests() throws DataAccessException {
-        new DatabaseManager();
+    public ServiceDatabaseTests() {
         AuthDAO authAccess = new AuthDatabaseAccess();
         UserDAO userAccess = new UserDatabaseAccess();
         GameDAO gameAccess = new GameDatabaseAccess();

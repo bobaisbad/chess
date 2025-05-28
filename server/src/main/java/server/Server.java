@@ -14,9 +14,8 @@ public class Server {
     private final GameService gameService;
     private final ClearService clearService;
 
-    public Server() throws DataAccessException {
+    public Server() {
         String service = "db";
-        new DatabaseManager();
         AuthDAO authAccess;
         UserDAO userAccess;
         GameDAO gameAccess;

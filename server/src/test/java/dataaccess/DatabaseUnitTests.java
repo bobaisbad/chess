@@ -27,8 +27,7 @@ public class DatabaseUnitTests {
     private final GameService gameService;
     private final ClearService clearService;
 
-    public DatabaseUnitTests() throws DataAccessException {
-        new DatabaseManager();
+    public DatabaseUnitTests() {
         AuthDAO authAccess = new AuthDatabaseAccess();
         UserDAO userAccess = new UserDatabaseAccess();
         GameDAO gameAccess = new GameDatabaseAccess();
