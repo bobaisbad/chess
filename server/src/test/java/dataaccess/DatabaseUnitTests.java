@@ -1,6 +1,6 @@
 package dataaccess;
 
-import Exceptions.*;
+import exceptions.*;
 import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;

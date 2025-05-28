@@ -1,4 +1,4 @@
-package Exceptions;
+package exceptions;
 
 public class ParentException extends Exception {
     private final int statusCode;

@@ -1,6 +1,6 @@
 package server;
 
-import Exceptions.*;
+import exceptions.*;
 import dataaccess.*;
 import model.ExceptionInfo;
 import request.*;

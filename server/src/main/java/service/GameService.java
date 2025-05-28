@@ -1,9 +1,9 @@
 package service;
 
-import Exceptions.BadRequestException;
-import Exceptions.ParentException;
-import Exceptions.TakenException;
-import Exceptions.UnauthorizedException;
+import exceptions.BadRequestException;
+import exceptions.ParentException;
+import exceptions.TakenException;
+import exceptions.UnauthorizedException;
 import dataaccess.*;
 import model.GameData;
 import model.GameInfo;

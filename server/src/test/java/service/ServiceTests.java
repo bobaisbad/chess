@@ -1,6 +1,6 @@
 package service;
 
-import Exceptions.*;
+import exceptions.*;
 import dataaccess.*;
 import model.GameInfo;
 import model.UserData;
@@ -12,12 +12,12 @@ import result.*;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ServiceMemoryTests {
+public class ServiceTests {
     private final UserService userService;
     private final GameService gameService;
     private final ClearService clearService;
 
-    public ServiceMemoryTests() {
+    public ServiceTests() {
         AuthDAO authAccess = new AuthMemoryDataAccess();
         UserDAO userAccess = new UserMemoryDataAccess();
         GameDAO gameAccess = new GameMemoryDataAccess();
