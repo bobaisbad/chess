@@ -28,7 +28,7 @@ public class StandardAPITests {
 
     @BeforeAll
     public static void init() throws DataAccessException {
-        server = new Server("memory");
+        server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 
