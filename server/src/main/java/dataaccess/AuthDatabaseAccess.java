@@ -9,11 +9,23 @@ import java.util.UUID;
 
 public class AuthDatabaseAccess implements AuthDAO {
 
-    public AuthData createAuth(String username) {
+    public AuthData createAuth(String username) throws DataAccessException {
+        String stmt = "INSERT INTO auths (authToken, username) " +
+                      "VALUES (?, ?)";
         String token = UUID.randomUUID().toString();
-        AuthData auth = new AuthData(token, username);
-        // auths.put(token, auth);
-        return auth;
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareCall(stmt)) {
+                prepStmt.setString(1, token);
+                prepStmt.setString(2, username);
+
+                prepStmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: ", 500);
+        }
+
+        return new AuthData(token, username);
     }
 
     public void deleteAuth(String authToken) {
