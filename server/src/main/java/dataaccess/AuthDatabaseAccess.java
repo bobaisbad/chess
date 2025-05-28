@@ -15,7 +15,7 @@ public class AuthDatabaseAccess implements AuthDAO {
         String token = UUID.randomUUID().toString();
 
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareCall(stmt)) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
                 prepStmt.setString(1, token);
                 prepStmt.setString(2, username);
 
@@ -28,8 +28,19 @@ public class AuthDatabaseAccess implements AuthDAO {
         return new AuthData(token, username);
     }
 
-    public void deleteAuth(String authToken) {
-        // auths.remove(authToken);
+    public void deleteAuth(String authToken) throws DataAccessException {
+        String stmt = "DELETE FROM auths " +
+                      "WHERE authToken = ?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setString(1, authToken);
+
+                prepStmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: ", 500);
+        }
     }
 
     public void deleteAllAuth() throws DataAccessException {
