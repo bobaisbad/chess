@@ -5,9 +5,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 import model.GameInfo;
-import model.UserData;
 
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +13,6 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
 
 public class GameDatabaseAccess implements GameDAO {
 
@@ -41,37 +38,36 @@ public class GameDatabaseAccess implements GameDAO {
                 return 0;
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new DataAccessException("Error: failed to insert new game", 500);
         }
     }
 
-//    try (Connection conn = DatabaseManager.getConnection()) {
-//
-//        } catch (SQLException ex) {
-//            throw new DataAccessException("Error: ", 500)
-//        }
-
     public GameData getGame(int gameID) throws DataAccessException {
         String stmt = "SELECT gameID, whiteUsername, blackUsername, gameName, game " +
                       "FROM games " +
-                      "WHERE gameID=?";
+                      "WHERE gameID = ?";
 
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var prepStmt = conn.prepareStatement(stmt)) {
                 prepStmt.setInt(1, gameID);
                 try (ResultSet result = prepStmt.executeQuery()) {
-                    result.next();
-                    gameID = result.getInt("gameID");
-                    String whiteUsername = result.getString("whiteUsername");
-                    String blackUsername = result.getString("blackUsername");
-                    String gameName = result.getString("gameName");
-                    ChessGame game = new Gson().fromJson(result.getString("game"), ChessGame.class);
+                    if (result.next()) {
+                        gameID = result.getInt("gameID");
+                        String whiteUsername = result.getString("whiteUsername");
+                        String blackUsername = result.getString("blackUsername");
+                        String gameName = result.getString("gameName");
+                        ChessGame game = new Gson().fromJson(result.getString("game"), ChessGame.class);
 
-                    return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                    }
+
+                    return null;
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: failed to retrieve user", 500);
+            ex.printStackTrace();
+            throw new DataAccessException("Error: failed to retrieve game", 500);
         }
     }
 
@@ -95,7 +91,8 @@ public class GameDatabaseAccess implements GameDAO {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: ", 500);
+            ex.printStackTrace();
+            throw new DataAccessException("Error: failed to retrieve all games", 500);
         }
     }
 
@@ -122,7 +119,8 @@ public class GameDatabaseAccess implements GameDAO {
                 prepStmt.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: ", 500);
+            ex.printStackTrace();
+            throw new DataAccessException("Error: failed to update game", 500);
         }
     }
 

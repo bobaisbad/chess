@@ -15,7 +15,8 @@ import java.util.List;
 public class UserDatabaseAccess implements UserDAO {
 
     public void createUser(RegisterRequest req) throws DataAccessException {
-        var stmt = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        var stmt = "INSERT INTO users (username, password, email) " +
+                   "VALUES (?, ?, ?)";
         String hashedPassword = BCrypt.hashpw(req.password(), BCrypt.gensalt());
 
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -27,6 +28,7 @@ public class UserDatabaseAccess implements UserDAO {
                 prepStmt.executeUpdate();
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new DataAccessException("Error: failed to insert new user", 500);
         }
     }
@@ -35,22 +37,36 @@ public class UserDatabaseAccess implements UserDAO {
         DatabaseManager.deleteTable("users");
     }
 
-    public UserData getUser(String username) throws DataAccessException {
-        String stmt = "SELECT username, password, email FROM users WHERE username=?";
+    public UserData getUser(String name) throws DataAccessException {
+        String stmt = "SELECT username, password, email " +
+                      "FROM users " +
+                      "WHERE username = ?";
+
+        System.out.println("Getting user...");
 
         try (Connection conn = DatabaseManager.getConnection()) {
+            System.out.println("Connected...");
             try (var prepStmt = conn.prepareStatement(stmt)) {
-                prepStmt.setString(1, username);
+                System.out.println("Prepped...");
+                prepStmt.setString(1, name);
+                System.out.println("Set...");
                 try (ResultSet result = prepStmt.executeQuery()) {
-                    result.next();
-                    username = result.getString("username");
-                    String password = result.getString("password");
-                    String email = result.getString("email");
+                    System.out.println("Queried...");
+                    if (result.next()) {
+                        System.out.println("Got result...");
+                        String resultUsername = result.getString("username");
+                        String password = result.getString("password");
+                        String email = result.getString("email");
 
-                    return new UserData(username, password, email);
+                        return new UserData(resultUsername, password, email);
+                    } else {
+                        System.out.println("No user...");
+                        return null;
+                    }
                 }
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new DataAccessException("Error: failed to retrieve user", 500);
         }
     }

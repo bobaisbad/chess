@@ -1,7 +1,6 @@
-package service;
+package dataaccess;
 
 import Exceptions.*;
-import dataaccess.*;
 import model.GameInfo;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,25 +8,22 @@ import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 import request.*;
 import result.*;
-import server.Server;
+import service.ClearService;
+import service.GameService;
+import service.UserService;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ServiceTests {
-    // final AuthDAO authAccess = new AuthMemoryDataAccess();
-//    final AuthDAO authAccess = new AuthDatabaseAccess();
-//    final UserService userService = new UserService(authAccess);
-//    final GameService gameService = new GameService(authAccess);
-//    final ClearService clearService = new ClearService(authAccess, gameService.getGameAccess(), userService.getUserAccess());
+public class DatabaseUnitTests {
 
-    private final UserService userService; // = new UserService(authAccess, userAccess);
-    private final GameService gameService; // = new GameService(authAccess, gameAccess);
+    private final UserService userService;
+    private final GameService gameService;
     private final ClearService clearService;
 
-    public ServiceTests() throws DataAccessException {
-        String service = "memory";
+    public DatabaseUnitTests() throws DataAccessException {
+        String service = "db";
 
         new DatabaseManager();
         AuthDAO authAccess;
@@ -84,15 +80,15 @@ public class ServiceTests {
         assert(result.email().equals(data.email()));
 //        assert(userService.getUserAccess().getUser("boba").equals(data));
         assertThrows(BadRequestException.class, () ->
-            userService.register(badUser1));
+                userService.register(badUser1));
         assertThrows(BadRequestException.class, () ->
-            userService.register(badUser2));
+                userService.register(badUser2));
         assert(userService.getUserAccess().getUser("is") == null);
         assertThrows(BadRequestException.class, () ->
-            userService.register(badUser3));
+                userService.register(badUser3));
         assert(userService.getUserAccess().getUser("baddest") == null);
         assertThrows(TakenException.class, () ->
-            userService.register(copyUser));
+                userService.register(copyUser));
         assert(userService.getUserAccess().getUser("boba") != null);
     }
 
@@ -116,11 +112,11 @@ public class ServiceTests {
         var nonExistentUser = new LoginRequest("hello", "goodbye");
 
         assertThrows(BadRequestException.class, () ->
-            userService.login(badUser1));
+                userService.login(badUser1));
         assertThrows(BadRequestException.class, () ->
-            userService.login(badUser2));
+                userService.login(badUser2));
         assertThrows(UnauthorizedException.class, () ->
-            userService.login(nonExistentUser));
+                userService.login(nonExistentUser));
     }
 
     @Test
@@ -140,7 +136,7 @@ public class ServiceTests {
         var badUSer = new LogoutRequest(UUID.randomUUID().toString());
 
         assertThrows(UnauthorizedException.class, () ->
-            userService.logout(badUSer));
+                userService.logout(badUSer));
     }
 
     @Test
@@ -167,11 +163,11 @@ public class ServiceTests {
         gameService.create(goodGame);
         assert(gameService.list(new ListRequest(reqResult.authToken())).games().contains(info));
         assertThrows(BadRequestException.class, () ->
-            gameService.create(badGame1));
+                gameService.create(badGame1));
         assertThrows(UnauthorizedException.class, () ->
-            gameService.create(badGame2));
+                gameService.create(badGame2));
         assertThrows(UnauthorizedException.class, () ->
-            gameService.create(badGame3));
+                gameService.create(badGame3));
     }
 
     @Test
@@ -203,9 +199,9 @@ public class ServiceTests {
         ListRequest badList2 = new ListRequest(UUID.randomUUID().toString());
 
         assertThrows(UnauthorizedException.class, () ->
-            gameService.list(badList1));
+                gameService.list(badList1));
         assertThrows(UnauthorizedException.class, () ->
-            gameService.list(badList2));
+                gameService.list(badList2));
     }
 
     @Test
@@ -235,17 +231,17 @@ public class ServiceTests {
         JoinRequest badJoin6 = new JoinRequest("HELLO", 1, reqResult.authToken());
 
         assertThrows(BadRequestException.class, () ->
-            gameService.join(badJoin1));
+                gameService.join(badJoin1));
         assertThrows(BadRequestException.class, () ->
-            gameService.join(badJoin2));
+                gameService.join(badJoin2));
         assertThrows(UnauthorizedException.class, () ->
-            gameService.join(badJoin3));
+                gameService.join(badJoin3));
         assertThrows(UnauthorizedException.class, () ->
-            gameService.join(badJoin4));
+                gameService.join(badJoin4));
         assertThrows(BadRequestException.class, () ->
-            gameService.join(badJoin5));
+                gameService.join(badJoin5));
         assertThrows(BadRequestException.class, () ->
-            gameService.join(badJoin6));
+                gameService.join(badJoin6));
 
         gameService.join(new JoinRequest("WHITE", 1, reqResult.authToken()));
         gameService.join(new JoinRequest("BLACK", 1, reqResult.authToken()));
@@ -254,9 +250,9 @@ public class ServiceTests {
         JoinRequest badJoin8 = new JoinRequest("BLACK", 1, reqResult.authToken());
 
         assertThrows(TakenException.class, () ->
-            gameService.join(badJoin7));
+                gameService.join(badJoin7));
         assertThrows(TakenException.class, () ->
-            gameService.join(badJoin8));
+                gameService.join(badJoin8));
 
         ListResult listRes = gameService.list(new ListRequest(reqResult.authToken()));
         GameInfo info = new GameInfo(1, "boba", "boba", "test1");
@@ -274,15 +270,15 @@ public class ServiceTests {
 
         clearService.clearAllData();
         assertThrows(UnauthorizedException.class, () ->
-            userService.login(new LoginRequest("boba", "pass")));
+                userService.login(new LoginRequest("boba", "pass")));
         assertThrows(UnauthorizedException.class, () ->
-            userService.login(new LoginRequest("is", "pass")));
+                userService.login(new LoginRequest("is", "pass")));
         assertThrows(UnauthorizedException.class, () ->
-            userService.login(new LoginRequest("baddest", "pass")));
+                userService.login(new LoginRequest("baddest", "pass")));
         assert(userService.getUserAccess().getUser("boba") == null);
         assert(userService.getUserAccess().getUser("is") == null);
         assert(userService.getUserAccess().getUser("baddest") == null);
         assertThrows(UnauthorizedException.class, () ->
-            gameService.list(new ListRequest(reqResult.authToken())).games().isEmpty());
+                gameService.list(new ListRequest(reqResult.authToken())).games().isEmpty());
     }
 }

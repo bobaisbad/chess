@@ -36,13 +36,13 @@ public class DatabaseManager {
     }
 
     static public void deleteTable(String table) throws DataAccessException {
-        var stmt = "TRUNCATE TABLE IF EXISTS ?";
+        var stmt = "TRUNCATE TABLE " + table;
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var prepStmt = conn.prepareStatement(stmt)) {
-                prepStmt.setString(1, table);
                 prepStmt.executeUpdate();
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new DataAccessException("Error: failed to drop table", 500);
         }
     }
@@ -107,7 +107,7 @@ public class DatabaseManager {
             conn.setCatalog(databaseName);
             return conn;
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: failed to get connection", ex.getErrorCode());
+            throw new DataAccessException("Error: failed to get connection", 500);
         }
     }
 

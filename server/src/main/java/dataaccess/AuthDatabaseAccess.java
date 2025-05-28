@@ -4,6 +4,7 @@ import Exceptions.DataAccessException;
 import model.AuthData;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -22,7 +23,8 @@ public class AuthDatabaseAccess implements AuthDAO {
                 prepStmt.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: ", 500);
+            ex.printStackTrace();
+            throw new DataAccessException("Error: failed to insert authToken", 500);
         }
 
         return new AuthData(token, username);
@@ -39,7 +41,8 @@ public class AuthDatabaseAccess implements AuthDAO {
                 prepStmt.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: ", 500);
+            ex.printStackTrace();
+            throw new DataAccessException("Error: failed to delete AuthData", 500);
         }
     }
 
@@ -55,12 +58,51 @@ public class AuthDatabaseAccess implements AuthDAO {
         DatabaseManager.deleteTable("auths");
     }
 
-    public boolean validateAuth(String authToken) {
-        return true; // !auths.containsKey(authToken);
+    public boolean validateAuth(String authToken) throws DataAccessException {
+        System.out.println("Validating auth...");
+
+        String stmt = "SELECT COUNT(*) AS total " +
+                      "FROM auths " +
+                      "WHERE authToken = ?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setString(1, authToken);
+
+                try (ResultSet result = prepStmt.executeQuery()) {
+                    if (result.next()) {
+                        return result.getInt("total") != 1;
+                    }
+
+                    return true;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new DataAccessException("Error: unable to retrieve authToken", 500);
+        }
     }
 
-    public String getUsername(String authToken) {
-        // AuthData data = auths.get(authToken);
-        return "sup"; // data.username();
+    public String getUsername(String authToken) throws DataAccessException {
+        String stmt = "SELECT username " +
+                      "FROM auths " +
+                      "WHERE authToken = ?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setString(1, authToken);
+
+                try (ResultSet result = prepStmt.executeQuery()) {
+                    if (result.next()) {
+                        return result.getString("username");
+                    }
+
+                    return null;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new DataAccessException("Error: unable to retrieve username", 500);
+        }
     }
 }

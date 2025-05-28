@@ -15,6 +15,7 @@ public class ClearService {
     }
 
     public void clearAllData() throws ParentException {
+        System.out.println("Clearing all data...");
         userAccess.deleteAllUsers();
         gameAccess.deleteAllGames();
         authAccess.deleteAllAuth();

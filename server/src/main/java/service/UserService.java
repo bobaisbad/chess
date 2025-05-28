@@ -26,6 +26,7 @@ public class UserService {
     }
 
     public LoginResult login(LoginRequest req) throws ParentException {
+        System.out.println("Logging in...");
         UserData user = userAccess.getUser(req.username());
 
         if (req.password() == null || req.username() == null) {
@@ -39,6 +40,7 @@ public class UserService {
     }
 
     public LogoutResult logout(LogoutRequest req) throws ParentException {
+        System.out.println("Logout...");
         if (authAccess.validateAuth(req.authToken())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
         }
@@ -48,6 +50,7 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest req) throws ParentException {
+        System.out.println("Registering...");
         UserData user = userAccess.getUser(req.username());
 
         if (user != null) {
