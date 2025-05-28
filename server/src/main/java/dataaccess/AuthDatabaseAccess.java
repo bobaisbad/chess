@@ -2,7 +2,6 @@ package dataaccess;
 
 import Exceptions.DataAccessException;
 import model.AuthData;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,20 +46,10 @@ public class AuthDatabaseAccess implements AuthDAO {
     }
 
     public void deleteAllAuth() throws DataAccessException {
-//        var stmt = "DROP TABLE IF EXISTS auths";
-//        try (Connection conn = DatabaseManager.getConnection()) {
-//            try (var prepStmt = conn.prepareStatement(stmt)) {
-//                prepStmt.executeUpdate();
-//            }
-//        } catch (SQLException ex) {
-//            throw new DataAccessException("Error: unable to drop table", 500);
-//        }
         DatabaseManager.deleteTable("auths");
     }
 
     public boolean validateAuth(String authToken) throws DataAccessException {
-        System.out.println("Validating auth...");
-
         String stmt = "SELECT COUNT(*) AS total " +
                       "FROM auths " +
                       "WHERE authToken = ?";

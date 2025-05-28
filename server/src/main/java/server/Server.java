@@ -10,9 +10,9 @@ import spark.*;
 import com.google.gson.Gson;
 
 public class Server {
-    private final UserService userService; // = new UserService(authAccess, userAccess);
-    private final GameService gameService; // = new GameService(authAccess, gameAccess);
-    private final ClearService clearService; // = new ClearService(authAccess, gameService.getGameAccess(), userService.getUserAccess());
+    private final UserService userService;
+    private final GameService gameService;
+    private final ClearService clearService;
 
     public Server(String service) throws DataAccessException {
         new DatabaseManager();
@@ -48,9 +48,7 @@ public class Server {
         Spark.post("/game", this::create);
         Spark.get("/game", this::list);
         Spark.put("/game", this::join);
-        Spark.exception(UnauthorizedException.class, this::exceptionHandler);
-        Spark.exception(BadRequestException.class, this::exceptionHandler);
-        Spark.exception(TakenException.class, this::exceptionHandler);
+        Spark.exception(ParentException.class, this::exceptionHandler);
 
         Spark.awaitInitialization();
         return Spark.port();

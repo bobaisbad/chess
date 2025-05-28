@@ -13,11 +13,9 @@ import request.ListRequest;
 import result.CreateResult;
 import result.JoinResult;
 import result.ListResult;
-
 import java.util.Collection;
 
 public class GameService {
-    // private final GameDAO gameAccess = new GameMemoryDataAccess();
     private final GameDAO gameAccess;
     private final AuthDAO authAccess;
 
@@ -27,7 +25,6 @@ public class GameService {
     }
 
     public CreateResult create(CreateRequest req) throws ParentException {
-        System.out.println("Creating a game...");
         if (authAccess.validateAuth(req.authToken())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
         } else if (req.gameName() == null) {
@@ -39,7 +36,6 @@ public class GameService {
     }
 
     public JoinResult join(JoinRequest req) throws ParentException {
-        System.out.println("Joining a game...");
         if (authAccess.validateAuth(req.authToken())) {
             throw new UnauthorizedException("Error: unauthorized", 401);
         }
@@ -74,17 +70,11 @@ public class GameService {
     }
 
     public ListResult list(ListRequest req) throws ParentException {
-        System.out.println("Listing games...");
         if (authAccess.validateAuth(req.authToken())) {
-            System.out.println("Bad auth");
             throw new UnauthorizedException("Error: unauthorized", 401);
         }
 
         Collection<GameInfo> games = gameAccess.listGames();
         return new ListResult(games);
-    }
-
-    public GameDAO getGameAccess() {
-        return gameAccess;
     }
 }

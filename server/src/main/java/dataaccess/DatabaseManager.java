@@ -1,7 +1,6 @@
 package dataaccess;
 
 import Exceptions.DataAccessException;
-
 import java.sql.*;
 import java.util.Properties;
 
@@ -107,6 +106,7 @@ public class DatabaseManager {
             conn.setCatalog(databaseName);
             return conn;
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new DataAccessException("Error: failed to get connection", 500);
         }
     }

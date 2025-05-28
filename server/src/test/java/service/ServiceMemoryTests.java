@@ -9,40 +9,19 @@ import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 import request.*;
 import result.*;
-import server.Server;
-
 import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ServiceTests {
-    // final AuthDAO authAccess = new AuthMemoryDataAccess();
-//    final AuthDAO authAccess = new AuthDatabaseAccess();
-//    final UserService userService = new UserService(authAccess);
-//    final GameService gameService = new GameService(authAccess);
-//    final ClearService clearService = new ClearService(authAccess, gameService.getGameAccess(), userService.getUserAccess());
-
-    private final UserService userService; // = new UserService(authAccess, userAccess);
-    private final GameService gameService; // = new GameService(authAccess, gameAccess);
+public class ServiceMemoryTests {
+    private final UserService userService;
+    private final GameService gameService;
     private final ClearService clearService;
 
-    public ServiceTests() throws DataAccessException {
-        String service = "memory";
-
+    public ServiceMemoryTests() throws DataAccessException {
         new DatabaseManager();
-        AuthDAO authAccess;
-        UserDAO userAccess;
-        GameDAO gameAccess;
-
-        if (service.equals("db")) {
-            authAccess = new AuthDatabaseAccess();
-            userAccess = new UserDatabaseAccess();
-            gameAccess = new GameDatabaseAccess();
-        } else {
-            authAccess = new AuthMemoryDataAccess();
-            userAccess = new UserMemoryDataAccess();
-            gameAccess = new GameMemoryDataAccess();
-        }
+        AuthDAO authAccess = new AuthMemoryDataAccess();
+        UserDAO userAccess = new UserMemoryDataAccess();
+        GameDAO gameAccess = new GameMemoryDataAccess();
 
         this.userService = new UserService(authAccess, userAccess);
         this.gameService = new GameService(authAccess, gameAccess);
@@ -65,7 +44,6 @@ public class ServiceTests {
         assert(result2.username().equals(data.username()));
         assert(BCrypt.checkpw(data.password(), result2.password()));
         assert(result2.email().equals(data.email()));
-//        assert(userService.getUserAccess().getUser("boba").equals(data));
     }
 
     @Test
@@ -82,7 +60,6 @@ public class ServiceTests {
         assert(result.username().equals(data.username()));
         assert(BCrypt.checkpw(data.password(), result.password()));
         assert(result.email().equals(data.email()));
-//        assert(userService.getUserAccess().getUser("boba").equals(data));
         assertThrows(BadRequestException.class, () ->
             userService.register(badUser1));
         assertThrows(BadRequestException.class, () ->

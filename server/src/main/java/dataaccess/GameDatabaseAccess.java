@@ -5,7 +5,6 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 import model.GameInfo;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -125,14 +124,6 @@ public class GameDatabaseAccess implements GameDAO {
     }
 
     public void deleteAllGames() throws DataAccessException {
-//        var stmt = "DROP TABLE IF EXISTS games";
-//        try (Connection conn = DatabaseManager.getConnection()) {
-//            try (var prepStmt = conn.prepareStatement(stmt)) {
-//                prepStmt.executeUpdate();
-//            }
-//        } catch (SQLException ex) {
-//            throw new DataAccessException("Error: unable to drop table", 500);
-//        }
         DatabaseManager.deleteTable("games");
     }
 }
