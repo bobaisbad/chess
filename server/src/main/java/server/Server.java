@@ -15,6 +15,12 @@ public class Server {
     private final ClearService clearService;
 
     public Server() {
+        try {
+            new DatabaseManager();
+        } catch (DataAccessException ex) {
+            System.out.println("Error: failed to configure the database");
+        }
+
         String service = "db";
         AuthDAO authAccess;
         UserDAO userAccess;
