@@ -55,6 +55,52 @@ public class DatabaseUnitTests {
         }
     }
 
+    void checkGame() throws DataAccessException, SQLException {
+        String stmt = "SELECT gameID, whiteUsername, blackUsername, gameName, game " +
+                      "FROM games " +
+                      "WHERE gameID = ?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setInt(1, 1);
+                try (ResultSet result = prepStmt.executeQuery()) {
+                    if (result.next()) {
+                        int gameID = result.getInt("gameID");
+                        String whiteUsername = result.getString("whiteUsername");
+                        String blackUsername = result.getString("blackUsername");
+                        String gameName = result.getString("gameName");
+                        ChessGame game = new Gson().fromJson(result.getString("game"), ChessGame.class);
+
+                        assert(1 == gameID);
+                        assert(whiteUsername == null);
+                        assert(blackUsername == null);
+                        assert("test1".equals(gameName));
+                        assert(game.getBoard() instanceof ChessBoard);
+                    } else {
+                        assert false;
+                    }
+                }
+            }
+        }
+    }
+
+    void checkTotal(String table, int cnt) throws DataAccessException, SQLException {
+        String stmt = "SELECT COUNT(*) AS total " +
+                      "FROM " + table;
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                try (ResultSet result = prepStmt.executeQuery()) {
+                    if (result.next()) {
+                        assert (result.getInt("total") == cnt);
+                    } else {
+                        assert false;
+                    }
+                }
+            }
+        }
+    }
+
     @Test
     void badAuthCreate() {
         assertThrows(DataAccessException.class, () ->
@@ -147,20 +193,7 @@ public class DatabaseUnitTests {
         authAccess.createAuth("baddest");
         authAccess.deleteAllAuth();
 
-        String stmt = "SELECT COUNT(*) AS total " +
-                      "FROM auths ";
-
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareStatement(stmt)) {
-                try (ResultSet result = prepStmt.executeQuery()) {
-                    if (result.next()) {
-                        assert (result.getInt("total") == 0);
-                    } else {
-                        assert false;
-                    }
-                }
-            }
-        }
+        checkTotal("auths", 0);
     }
 
     @Test
@@ -219,52 +252,14 @@ public class DatabaseUnitTests {
         userAccess.createUser(new RegisterRequest("baddest", "pass", "hi@gmail.com"));
         userAccess.deleteAllUsers();
 
-        String stmt = "SELECT COUNT(*) AS total " +
-                      "FROM users ";
-
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareStatement(stmt)) {
-                try (ResultSet result = prepStmt.executeQuery()) {
-                    if (result.next()) {
-                        assert (result.getInt("total") == 0);
-                    } else {
-                        assert false;
-                    }
-                }
-            }
-        }
+        checkTotal("users", 0);
     }
 
     @Test
     void goodGameCreate() throws ParentException, SQLException {
         gameAccess.createGame("test1");
 
-        String stmt = "SELECT gameID, whiteUsername, blackUsername, gameName, game " +
-                      "FROM games " +
-                      "WHERE gameID = ?";
-
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareStatement(stmt)) {
-                prepStmt.setInt(1, 1);
-                try (ResultSet result = prepStmt.executeQuery()) {
-                    if (result.next()) {
-                        int gameID = result.getInt("gameID");
-                        String whiteUsername = result.getString("whiteUsername");
-                        String blackUsername = result.getString("blackUsername");
-                        String gameName = result.getString("gameName");
-                        ChessGame game = new Gson().fromJson(result.getString("game"), ChessGame.class);
-
-                        assert(1 == gameID);
-                        assert(whiteUsername == null);
-                        assert(blackUsername == null);
-                        assert("test1".equals(gameName));
-                        assert(game.getBoard() instanceof ChessBoard);
-                    } else {
-                        assert false;
-                    }
-                }
-            }
-        }
+        checkGame();
     }
 
     @Test
@@ -273,20 +268,7 @@ public class DatabaseUnitTests {
         assertThrows(DataAccessException.class, () ->
                 gameAccess.createGame(null));
 
-        String stmt = "SELECT COUNT(*) AS total " +
-                      "FROM games";
-
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareStatement(stmt)) {
-                try (ResultSet result = prepStmt.executeQuery()) {
-                    if (result.next()) {
-                        assert (result.getInt("total") == 1);
-                    } else {
-                        assert false;
-                    }
-                }
-            }
-        }
+        checkTotal("games", 1);
     }
 
     @Test
@@ -333,7 +315,7 @@ public class DatabaseUnitTests {
         GameData data = gameAccess.getGame(1);
         gameAccess.updateGame(data, "WHITE", "boba");
 
-        String stmt = "SELECT gameID, whiteUsername, blackUsername, gameName, game " +
+        String stmt = "SELECT whiteUsername, blackUsername " +
                       "FROM games " +
                       "WHERE gameID = ?";
 
@@ -342,17 +324,11 @@ public class DatabaseUnitTests {
                 prepStmt.setInt(1, 1);
                 try (ResultSet result = prepStmt.executeQuery()) {
                     if (result.next()) {
-                        int gameID = result.getInt("gameID");
                         String whiteUsername = result.getString("whiteUsername");
                         String blackUsername = result.getString("blackUsername");
-                        String gameName = result.getString("gameName");
-                        ChessGame game = new Gson().fromJson(result.getString("game"), ChessGame.class);
 
-                        assert(1 == gameID);
                         assert(whiteUsername.equals("boba"));
                         assert(blackUsername == null);
-                        assert("test1".equals(gameName));
-                        assert(game.equals(data.game()));
                     } else {
                         assert false;
                     }
@@ -367,32 +343,7 @@ public class DatabaseUnitTests {
         GameData data = new GameData(2, null, null, "test1", new ChessGame());
         gameAccess.updateGame(data, "WHITE", "boba");
 
-        String stmt = "SELECT gameID, whiteUsername, blackUsername, gameName, game " +
-                      "FROM games " +
-                      "WHERE gameID = ?";
-
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareStatement(stmt)) {
-                prepStmt.setInt(1, 1);
-                try (ResultSet result = prepStmt.executeQuery()) {
-                    if (result.next()) {
-                        int gameID = result.getInt("gameID");
-                        String whiteUsername = result.getString("whiteUsername");
-                        String blackUsername = result.getString("blackUsername");
-                        String gameName = result.getString("gameName");
-                        ChessGame game = new Gson().fromJson(result.getString("game"), ChessGame.class);
-
-                        assert(1 == gameID);
-                        assert(whiteUsername == null);
-                        assert(blackUsername == null);
-                        assert("test1".equals(gameName));
-                        assert(game.getBoard() instanceof ChessBoard);
-                    } else {
-                        assert false;
-                    }
-                }
-            }
-        }
+        checkGame();
     }
 
     @Test
@@ -402,19 +353,6 @@ public class DatabaseUnitTests {
         gameAccess.createGame("test3");
         gameAccess.deleteAllGames();
 
-        String stmt = "SELECT COUNT(*) AS total " +
-                      "FROM games";
-
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareStatement(stmt)) {
-                try (ResultSet result = prepStmt.executeQuery()) {
-                    if (result.next()) {
-                        assert (result.getInt("total") == 0);
-                    } else {
-                        assert false;
-                    }
-                }
-            }
-        }
+        checkTotal("games", 0);
     }
 }
