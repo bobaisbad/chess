@@ -101,6 +101,26 @@ public class DatabaseUnitTests {
         }
     }
 
+    void checkIfExists(String table, String column, String val, int total) throws DataAccessException, SQLException {
+        String stmt = "SELECT COUNT(*) AS total " +
+                      "FROM " + table + " " +
+                      "WHERE " + column + " = ?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setString(1, val);
+
+                try (ResultSet result = prepStmt.executeQuery()) {
+                    if (result.next()) {
+                        assert (result.getInt("total") == total);
+                    } else {
+                        assert false;
+                    }
+                }
+            }
+        }
+    }
+
     @Test
     void badAuthCreate() {
         assertThrows(DataAccessException.class, () ->
@@ -112,23 +132,7 @@ public class DatabaseUnitTests {
         AuthData data = authAccess.createAuth("boba");
         authAccess.deleteAuth(data.authToken());
 
-        String stmt = "SELECT COUNT(*) AS total " +
-                      "FROM auths " +
-                      "WHERE username = ?";
-
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareStatement(stmt)) {
-                prepStmt.setString(1, data.username());
-
-                try (ResultSet result = prepStmt.executeQuery()) {
-                    if (result.next()) {
-                        assert (result.getInt("total") == 0);
-                    } else {
-                        assert false;
-                    }
-                }
-            }
-        }
+        checkIfExists("auths", "username", data.username(), 0);
     }
 
     @Test
@@ -139,23 +143,7 @@ public class DatabaseUnitTests {
         authAccess.deleteAuth(token);
         authAccess.deleteAuth(null);
 
-        String stmt = "SELECT COUNT(*) AS total " +
-                      "FROM auths " +
-                      "WHERE authToken = ?";
-
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareStatement(stmt)) {
-                prepStmt.setString(1, token);
-
-                try (ResultSet result = prepStmt.executeQuery()) {
-                    if (result.next()) {
-                        assert (result.getInt("total") == 0);
-                    } else {
-                        assert false;
-                    }
-                }
-            }
-        }
+        checkIfExists("auths", "authToken", token, 0);
     }
 
     @Test
@@ -216,22 +204,7 @@ public class DatabaseUnitTests {
     void goodUserCreate() throws ParentException, SQLException {
         userAccess.createUser(new RegisterRequest("boba", "pass", "hi@gmail.com"));
 
-        String stmt = "SELECT COUNT(*) AS total " +
-                      "FROM users " +
-                      "WHERE username = ?";
-
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (var prepStmt = conn.prepareStatement(stmt)) {
-                prepStmt.setString(1, "boba");
-                try (ResultSet result = prepStmt.executeQuery()) {
-                    if (result.next()) {
-                        assert (result.getInt("total") == 1);
-                    } else {
-                        assert false;
-                    }
-                }
-            }
-        }
+        checkIfExists("users", "username", "boba", 1);
     }
 
     @Test
