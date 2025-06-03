@@ -72,10 +72,6 @@ public class ChessClient {
         return new Command(cmd, params);
     }
 
-    private String clear() {
-        //
-    }
-
     private String register(String[] params) throws ParentException {
         if (params.length == 3) {
             RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
