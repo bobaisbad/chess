@@ -14,11 +14,9 @@ import java.util.HashMap;
 
 public class ServerFacade {
     private final String serverURL;
-    private final String authToken;
 
     public ServerFacade(int port) {
         this.serverURL = "http://localhost:" + port;
-        this.authToken = null;
     }
 
     public ClearResult clear() throws ParentException {
