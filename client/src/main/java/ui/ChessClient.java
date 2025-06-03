@@ -1,11 +1,8 @@
 package ui;
 
 import exceptions.ParentException;
-import request.LoginRequest;
-import request.LogoutRequest;
-import request.RegisterRequest;
-import result.LoginResult;
-import result.RegisterResult;
+import request.*;
+import result.*;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -114,15 +111,30 @@ public class ChessClient {
     }
 
     private String create(String[] params) throws ParentException {
-        //
+        if (params.length == 1) {
+            CreateRequest req = new CreateRequest(params[0], authToken);
+            CreateResult res = server.create(req);
+            return "Created the chess game " + params[0] + " with a gameID of " + res.gameID();
+        }
+        throw new ParentException("Expected: <gameName>", 400);
     }
 
     private String list(String[] params) throws ParentException {
-        //
+        if (params.length == 0) {
+            ListRequest req = new ListRequest(authToken);
+            ListResult res = server.list(req);
+            return "Games: " + res.games().toString();
+        }
+        throw new ParentException("Expected nothing", 400);
     }
 
     private String join(String[] params) throws ParentException {
-        //
+        if (params.length == 2) {
+            JoinRequest req = new JoinRequest(params[1], Integer.parseInt(params[0]), username);
+            server.join(req);
+            return "Joined game " + params[0] + " as " + params[1];
+        }
+        throw new ParentException("Expected: <gameID> <white | black>", 400);
     }
 
     private String observe(String[] params) throws ParentException {
@@ -141,7 +153,7 @@ public class ChessClient {
             return """
                    create <GAMENAME> - create a new game
                    list - list all games and who's playing
-                   join <GAMEID> - join and play a chess game
+                   join <GAMEID> <WHITE | BLACK> - join and play a chess game
                    observer <GAMEID> - observe a game in progress
                    logout - logout of your account
                    quit - leave the program
