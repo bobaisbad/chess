@@ -1,7 +1,10 @@
 package ui;
 
 import exceptions.ParentException;
+import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
+import result.LoginResult;
 import result.RegisterResult;
 import server.ServerFacade;
 
@@ -79,9 +82,9 @@ public class ChessClient {
     private String register(String[] params) throws ParentException {
         if (params.length == 3) {
             RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
-            RegisterResult result = server.register(req);
-            authToken = result.authToken();
-            username = result.username();
+            RegisterResult res = server.register(req);
+            authToken = res.authToken();
+            username = res.username();
             loggedIn = true;
             return "Logged in as " + username;
         }
@@ -89,11 +92,25 @@ public class ChessClient {
     }
 
     private String login(String[] params) throws ParentException {
-
+        if (params.length == 2) {
+            LoginRequest req = new LoginRequest(params[0], params[1]);
+            LoginResult res = server.login(req);
+            authToken = res.authToken();
+            username = res.username();
+            loggedIn = true;
+            return "Logged in as " + username;
+        }
+        throw new ParentException("Expected: <username> <password>", 400);
     }
 
     private String logout(String[] params) throws ParentException {
-        //
+        if (params.length == 0) {
+            LogoutRequest req = new LogoutRequest(authToken);
+            server.logout(req);
+            loggedIn = false;
+            return "Logged out";
+        }
+        throw new ParentException("Expected nothing", 400);
     }
 
     private String create(String[] params) throws ParentException {

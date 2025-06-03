@@ -34,7 +34,7 @@ public class ServerFacade {
         return this.makeHTTP("POST", path, req, LoginResult.class);
     }
 
-    public LogoutResult logout(LoginRequest req) throws ParentException {
+    public LogoutResult logout(LogoutRequest req) throws ParentException {
         var path = "/session";
         return this.makeHTTP("DELETE", path, req, LogoutResult.class);
     }
