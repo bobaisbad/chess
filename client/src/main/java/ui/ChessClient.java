@@ -11,11 +11,12 @@ public class ChessClient {
     private String username = null;
     private String authToken = null;
     private final ServerFacade server;
-    private final PreRepl pre = new PreRepl();
     private boolean loggedIn = false;
 
     public ChessClient() {
         this.server = new ServerFacade(8080);
+        PreRepl pre = new PreRepl();
+        pre.run(this);
     }
 
     public String preEval(String input) {
@@ -156,5 +157,9 @@ public class ChessClient {
                    help - print out possible commands
                    """;
         }
+    }
+
+    public boolean getLoginStatus() {
+        return loggedIn;
     }
 }
