@@ -12,6 +12,7 @@ public class ChessClient {
     private String authToken = null;
     private final ServerFacade server;
     private boolean loggedIn = false;
+    private boolean gameStatus = false;
 
     public ChessClient() {
         this.server = new ServerFacade(8080);
@@ -26,7 +27,7 @@ public class ChessClient {
             return switch (cmd.cmd()) {
                 case "register" -> register(cmd.params());
                 case "login" -> login(cmd.params());
-                case "quit" -> "quit";
+                case "quit" -> quit();
                 default -> help();
             };
         } catch (ParentException ex) {
@@ -58,7 +59,7 @@ public class ChessClient {
                 case "list" -> list(cmd.params());
                 case "join" -> join(cmd.params());
                 case "observe" -> observe(cmd.params());
-                case "quit" -> "quit";
+                case "quit" -> quit();
                 default -> help();
             };
         } catch (ParentException ex) {
@@ -69,7 +70,7 @@ public class ChessClient {
     private Command getCommand(String input) {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
-        String[] params = (tokens.length > 1) ? Arrays.copyOfRange(tokens, 1, tokens.length) : null;
+        String[] params = (tokens.length > 1) ? Arrays.copyOfRange(tokens, 1, tokens.length) : new String[] {};
         return new Command(cmd, params);
     }
 
@@ -92,6 +93,7 @@ public class ChessClient {
             authToken = res.authToken();
             username = res.username();
             loggedIn = true;
+            System.out.println(authToken);
             return "Logged in as " + username;
         }
         throw new ParentException("Expected: <username> <password>", 400);
@@ -129,6 +131,7 @@ public class ChessClient {
         if (params.length == 2) {
             JoinRequest req = new JoinRequest(params[1], Integer.parseInt(params[0]), username);
             server.join(req);
+            gameStatus = true;
             return "Joined game " + params[0] + " as " + params[1];
         }
         throw new ParentException("Expected: <gameID> <white | black>", 400);
@@ -159,7 +162,17 @@ public class ChessClient {
         }
     }
 
+    private String quit() {
+        loggedIn = false;
+        gameStatus = false;
+        return  "quit";
+    }
+
     public boolean getLoginStatus() {
         return loggedIn;
+    }
+
+    public boolean getGameStatus() {
+        return gameStatus;
     }
 }

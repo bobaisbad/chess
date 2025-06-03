@@ -6,8 +6,7 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class PreRepl {
-    GameRepl game = new GameRepl();
-    PostRepl post = new PostRepl();
+    private final PostRepl post = new PostRepl();
 
     public void run(ChessClient client) {
         Scanner scanner = new Scanner(System.in);
@@ -16,15 +15,16 @@ public class PreRepl {
             printPrompt();
             String line = scanner.nextLine();
             result = client.preEval(line);
-            System.out.print(result);
+            System.out.print(SET_TEXT_COLOR_BLUE + result);
 
             if (client.getLoginStatus()) {
-                post.run(client);
+                post.run(client, scanner);
             }
         }
+        System.out.println();
     }
 
-    private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + ">>> ");
+    public void printPrompt() {
+        System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_OUT] >>> ");
     }
 }

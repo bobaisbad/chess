@@ -100,11 +100,14 @@ public class ServerFacade {
     }
 
     private void exceptionHandler(HttpURLConnection connection) throws IOException, ParentException {
-        if (connection.getResponseCode() / 100 != 2) {
+//        System.out.println(connection.getResponseCode());
+//        System.out.println(connection.getResponseMessage());
+        var code = connection.getResponseCode();
+        if (code / 100 != 2) {
             try (InputStream exception = connection.getErrorStream()) {
                 if (exception != null) {
-                    var map =new Gson().fromJson(new InputStreamReader(exception), HashMap.class);
-                    var code =((Double)map.get("status")).intValue();
+                    var map = new Gson().fromJson(new InputStreamReader(exception), HashMap.class);
+//                    System.out.println(map);
                     String message = map.get("message").toString();
                     throw new ParentException(message, code);
                 }
