@@ -98,8 +98,9 @@ public class GameDatabaseAccess implements GameDAO {
     public GameData updateGame(GameData game, String playerColor, String username) throws DataAccessException {
         String whiteUsername = game.whiteUsername();
         String blackUsername = game.blackUsername();
+        String color = playerColor.toLowerCase();
 
-        if (playerColor.equals("white")) {
+        if (color.equals("white")) {
             whiteUsername = username;
         } else {
             blackUsername = username;

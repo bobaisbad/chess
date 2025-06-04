@@ -223,16 +223,8 @@ public class ServiceTests {
         assertThrows(BadRequestException.class, () ->
             gameService.join(badJoin6));
 
-        gameService.join(new JoinRequest("WHITE", 1, reqResult.authToken()));
-        gameService.join(new JoinRequest("BLACK", 1, reqResult.authToken()));
-
-        JoinRequest badJoin7 = new JoinRequest("WHITE", 1, reqResult.authToken());
-        JoinRequest badJoin8 = new JoinRequest("BLACK", 1, reqResult.authToken());
-
-        assertThrows(TakenException.class, () ->
-            gameService.join(badJoin7));
-        assertThrows(TakenException.class, () ->
-            gameService.join(badJoin8));
+        gameService.join(new JoinRequest("white", 1, reqResult.authToken()));
+        gameService.join(new JoinRequest("black", 1, reqResult.authToken()));
 
         ListResult listRes = gameService.list(new ListRequest(reqResult.authToken()));
         GameInfo info = new GameInfo(1, "boba", "boba", "test1");

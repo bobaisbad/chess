@@ -286,7 +286,7 @@ public class DatabaseUnitTests {
     void goodGameUpdate() throws ParentException, SQLException {
         gameAccess.createGame("test1");
         GameData data = gameAccess.getGame(1);
-        gameAccess.updateGame(data, "WHITE", "boba");
+        gameAccess.updateGame(data, "white", "boba");
 
         String stmt = "SELECT whiteUsername, blackUsername " +
                       "FROM games " +

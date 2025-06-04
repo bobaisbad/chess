@@ -47,21 +47,22 @@ public class GameService {
         }
 
         String username = authAccess.getUsername(req.authToken());
+        String color = req.playerColor().toLowerCase();
 
-        if (req.playerColor().equals("white")) {
+        if (color.equals("white")) {
             if (game.whiteUsername() != null && !game.whiteUsername().equals(username)) {
                 throw new TakenException("Error: already taken", 403);
             }
 
-            game = gameAccess.updateGame(game, req.playerColor(), username);
+            game = gameAccess.updateGame(game, color, username);
             return new JoinResult(game.game());
 
-        } else if (req.playerColor().equals("black")) {
+        } else if (color.equals("black")) {
             if (game.blackUsername() != null && !game.blackUsername().equals(username)) {
                 throw new TakenException("Error: already taken", 403);
             }
 
-            game = gameAccess.updateGame(game, req.playerColor(), username);
+            game = gameAccess.updateGame(game, color, username);
             return new JoinResult(game.game());
 
         } else {
