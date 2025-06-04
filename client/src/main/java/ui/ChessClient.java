@@ -2,11 +2,12 @@ package ui;
 
 import chess.ChessGame;
 import exceptions.ParentException;
+import model.GameInfo;
 import request.*;
 import result.*;
 import server.ServerFacade;
-
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class ChessClient {
     private String username = null;
@@ -17,6 +18,7 @@ public class ChessClient {
     private String userColor = null;
     private ChessGame game = null;
     private boolean quit = false;
+    private HashMap<Integer, Integer> listedGames = new HashMap<>();
 
     public ChessClient() {
         this.server = new ServerFacade(8080);
@@ -45,6 +47,7 @@ public class ChessClient {
         try {
             return switch (cmd.cmd()) {
                 case "quit" -> quit();
+                case "leave" -> "Leaving the game...";
                 default -> help();
             };
         } catch (ParentException ex) {
@@ -61,7 +64,7 @@ public class ChessClient {
                 case "create" -> create(cmd.params());
                 case "list" -> list(cmd.params());
                 case "join" -> join(cmd.params());
-//                case "observe" -> observe(cmd.params());
+                case "observe" -> observe(cmd.params());
                 case "quit" -> quit();
                 default -> help();
             };
@@ -78,27 +81,35 @@ public class ChessClient {
     }
 
     private String register(String[] params) throws ParentException {
-        if (params.length == 3) {
-            RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
-            RegisterResult res = server.register(req);
-            authToken = res.authToken();
-            username = res.username();
-            loggedIn = true;
-            return "Logged in as " + username;
+        try {
+            if (params.length == 3) {
+                RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
+                RegisterResult res = server.register(req);
+                authToken = res.authToken();
+                username = res.username();
+                loggedIn = true;
+                return "Logged in as " + username;
+            }
+            throw new ParentException("Expected: <username> <password> <email>", 400);
+        } catch (ParentException ex) {
+            throw new ParentException("Error: username already taken", 400);
         }
-        throw new ParentException("Expected: <username> <password> <email>", 400);
     }
 
     private String login(String[] params) throws ParentException {
-        if (params.length == 2) {
-            LoginRequest req = new LoginRequest(params[0], params[1]);
-            LoginResult res = server.login(req);
-            authToken = res.authToken();
-            username = res.username();
-            loggedIn = true;
-            return "Logged in as " + username;
+        try {
+            if (params.length == 2) {
+                LoginRequest req = new LoginRequest(params[0], params[1]);
+                LoginResult res = server.login(req);
+                authToken = res.authToken();
+                username = res.username();
+                loggedIn = true;
+                return "Logged in as " + username;
+            }
+            throw new ParentException("Expected: <username> <password>", 400);
+        } catch (ParentException ex) {
+            throw new ParentException("Error: incorrect username or password", 400);
         }
-        throw new ParentException("Expected: <username> <password>", 400);
     }
 
     private String logout(String[] params) throws ParentException {
@@ -124,26 +135,48 @@ public class ChessClient {
         if (params.length == 0) {
             ListRequest req = new ListRequest(authToken);
             ListResult res = server.list(req);
-            return "Games: " + res.games().toString();
+            StringBuilder list = new StringBuilder();
+            GameInfo[] games = res.games().toArray(new GameInfo[0]);
+            listedGames.clear();
+
+            for (int i = 0; i < games.length; i++) {
+                list.append("\n")
+                            .append(i + 1)
+                            .append(". Game Name: ")
+                            .append(games[i].gameName())
+                            .append(", White: ")
+                            .append(games[i].whiteUsername())
+                            .append(", Black: ")
+                            .append(games[i].blackUsername());
+                listedGames.put(i + 1, games[i].gameID());
+            }
+            return "Games:" + list;
         }
         throw new ParentException("Expected nothing", 400);
     }
 
     private String join(String[] params) throws ParentException {
-        if (params.length == 2) {
-            JoinRequest req = new JoinRequest(params[1], Integer.parseInt(params[0]), authToken);
-            JoinResult res = server.join(req);
-            gameStatus = true;
-            userColor = params[1];
-            game = res.game();
-            return "Joined game " + params[0] + " as " + params[1];
+        try {
+            if (params.length == 2) {
+                int gameID = listedGames.get(Integer.parseInt(params[0]));
+                JoinRequest req = new JoinRequest(params[1], gameID, authToken);
+                JoinResult res = server.join(req);
+                gameStatus = true;
+                userColor = params[1];
+                game = res.game();
+                return "Joined game " + params[0] + " as " + params[1];
+            }
+            throw new ParentException("Expected: <game#> <white | black>", 400);
+        } catch (ParentException ex) {
+            throw new ParentException(ex.getMessage(), 400);
+        } catch (NumberFormatException ex) {
+            throw new ParentException("Expected: <game#> <white | black>", 400);
         }
-        throw new ParentException("Expected: <gameID> <white | black>", 400);
     }
 
-//    private String observe(String[] params) throws ParentException {
-//        return "";
-//    }
+    private String observe(String[] params) throws ParentException {
+        return "In the works. Thanks for your patience!";
+    }
 
     private String help() {
         if (!loggedIn) {
@@ -156,8 +189,8 @@ public class ChessClient {
             return """
                    create <GAMENAME> - create a new game
                    list - list all games and who's playing
-                   join <GAMEID> <WHITE | BLACK> - join and play a chess game
-                   observer <GAMEID> - observe a game in progress
+                   join <GAME#> <WHITE | BLACK> - join and play a chess game
+                   observe <GAME#> - observe a game in progress
                    logout - logout of your account
                    quit - leave the program
                    help - print out possible commands""";

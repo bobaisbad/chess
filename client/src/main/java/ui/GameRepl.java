@@ -4,11 +4,9 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
-
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.BLACK_ROOK;
 
@@ -19,21 +17,21 @@ public class GameRepl {
         var result = "";
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         this.game = client.getGame();
+        System.out.print("\n");
 
-        while (!result.equals("quit") && !client.getQuit()) {
+        while (!result.equals("quit") && !client.getQuit() && !result.equals("leave")) {
             if (client.getColor().equals("black")) {
                 printBoardBlack(out);
             } else {
                 printBoardWhite(out);
             }
-            System.out.print("\n");
+
             printPrompt();
             String line = scanner.nextLine();
             result = client.gameEval(line);
             System.out.print(SET_TEXT_COLOR_BLUE + result);
             System.out.print("\n");
         }
-//        System.out.println();
     }
 
     private void printPrompt() {
@@ -45,16 +43,6 @@ public class GameRepl {
         drawLetters(out, letters);
         char[] ascii = {'h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'};
         int[] numbers = {1, 2, 3 , 4 , 5, 6, 7, 8};
-//        String[][] pieces = {
-//                {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_KING, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK},
-//                {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN},
-//                {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-//                {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-//                {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-//                {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-//                {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
-//                {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK}
-//        };
         drawRows(out, numbers, ascii);
         drawLetters(out, letters);
     }
