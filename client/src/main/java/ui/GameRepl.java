@@ -20,7 +20,7 @@ public class GameRepl {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         this.game = client.getGame();
 
-        while (!result.equals("quit")) {
+        while (!result.equals("quit") && !client.getQuit()) {
             if (client.getColor().equals("black")) {
                 printBoardBlack(out);
             } else {
@@ -33,7 +33,7 @@ public class GameRepl {
             System.out.print(SET_TEXT_COLOR_BLUE + result);
             System.out.print("\n");
         }
-        System.out.println();
+//        System.out.println();
     }
 
     private void printPrompt() {
@@ -41,9 +41,10 @@ public class GameRepl {
     }
 
     private void printBoardBlack(PrintStream out) {
-        String[] letters = {" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
+        String[] letters = {" h\u2003", " g\u2003", " f\u2003", " e\u2003", " d\u2003", " c\u2003", " b\u2003", " a\u2003"};
         drawLetters(out, letters);
-        String[] numbers = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
+        char[] ascii = {'h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'};
+        int[] numbers = {1, 2, 3 , 4 , 5, 6, 7, 8};
 //        String[][] pieces = {
 //                {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_KING, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK},
 //                {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN},
@@ -54,46 +55,54 @@ public class GameRepl {
 //                {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN},
 //                {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK}
 //        };
-        drawRows(out, numbers);
+        drawRows(out, numbers, ascii);
         drawLetters(out, letters);
     }
 
     private void printBoardWhite(PrintStream out) {
-        String[] letters = {" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "};
+        String[] letters = {" a\u2003", " b\u2003", " c\u2003", " d\u2003", " e\u2003", " f\u2003", " g\u2003", " h\u2003"};
         drawLetters(out, letters);
-        String[] numbers = {" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "};
-        drawRows(out, numbers);
+        char[] ascii = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+        int[] numbers = {8, 7, 6, 5, 4, 3, 2, 1};
+        drawRows(out, numbers, ascii);
         drawLetters(out, letters);
     }
 
     private void drawLetters(PrintStream out, String[] letters) {
         setGray(out);
         out.print(EMPTY);
+        out.print(SET_TEXT_COLOR_BLACK);
+        out.print(SET_TEXT_BOLD);
         for (int i = 0; i < 8; i++) {
-            out.print(SET_BG_COLOR_BLACK);
             out.print(letters[i]);
         }
+        out.print(RESET_TEXT_BOLD_FAINT);
         out.print(EMPTY);
-        setBlack(out);
+        setDefault(out);
         out.println();
     }
 
-    private void drawRows(PrintStream out, String[] numbers) {
+    private void drawRows(PrintStream out, int[] numbers, char[] letters) {
         ChessBoard board = game.getBoard();
         ChessPosition position = new ChessPosition(1, 1);
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 8; i++) { // Rows
             setGray(out);
-            out.print(numbers[i]);
-            for (int j = 0; j < 8; j++) {
-                if (j % 2 == 0) {
+            out.print(SET_TEXT_COLOR_BLACK);
+            out.print(SET_TEXT_BOLD);
+            out.print("\u2003" + numbers[i] + " ");
+            out.print(RESET_TEXT_BOLD_FAINT);
+            for (int j = 0; j < 8; j++) { // Columns
+                if (j % 2 == 0 && i % 2 == 0) {
+                    setTan(out);
+                } else if (j % 2 == 1 && i % 2 == 1) {
                     setTan(out);
                 } else {
                     setBrown(out);
                 }
 
-                position.setCol(j + 1);
-                position.setRow(i + 1);
+                position.setCol(letters[j] - 96);
+                position.setRow(numbers[i]);
                 ChessPiece piece = board.getPiece(position);
 
                 if (piece == null) {
@@ -105,8 +114,11 @@ public class GameRepl {
                 }
             }
             setGray(out);
-            out.print(numbers[i]);
-            setBlack(out);
+            out.print(SET_TEXT_COLOR_BLACK);
+            out.print(SET_TEXT_BOLD);
+            out.print(" " + numbers[i] + "\u2003");
+            out.print(RESET_TEXT_BOLD_FAINT);
+            setDefault(out);
             out.println();
         }
     }
@@ -126,9 +138,9 @@ public class GameRepl {
         out.print(SET_TEXT_COLOR_TAN);
     }
 
-    private void setBlack(PrintStream out) {
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_BLACK);
+    private void setDefault(PrintStream out) {
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
     }
 
     private String getPieceType(ChessPiece piece) {

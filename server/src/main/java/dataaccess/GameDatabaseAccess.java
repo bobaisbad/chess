@@ -99,7 +99,7 @@ public class GameDatabaseAccess implements GameDAO {
         String whiteUsername = game.whiteUsername();
         String blackUsername = game.blackUsername();
 
-        if (playerColor.equals("WHITE")) {
+        if (playerColor.equals("white")) {
             whiteUsername = username;
         } else {
             blackUsername = username;

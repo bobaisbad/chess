@@ -1,6 +1,5 @@
 package service;
 
-import chess.ChessGame;
 import exceptions.BadRequestException;
 import exceptions.ParentException;
 import exceptions.TakenException;
@@ -47,21 +46,21 @@ public class GameService {
             throw new BadRequestException("Error: bad request", 400);
         }
 
-        if (req.playerColor().equals("WHITE")) {
-            if (game.whiteUsername() != null) {
+        String username = authAccess.getUsername(req.authToken());
+
+        if (req.playerColor().equals("white")) {
+            if (game.whiteUsername() != null && !game.whiteUsername().equals(username)) {
                 throw new TakenException("Error: already taken", 403);
             }
 
-            String username = authAccess.getUsername(req.authToken());
             game = gameAccess.updateGame(game, req.playerColor(), username);
             return new JoinResult(game.game());
 
-        } else if (req.playerColor().equals("BLACK")) {
-            if (game.blackUsername() != null) {
+        } else if (req.playerColor().equals("black")) {
+            if (game.blackUsername() != null && !game.blackUsername().equals(username)) {
                 throw new TakenException("Error: already taken", 403);
             }
 
-            String username = authAccess.getUsername(req.authToken());
             game = gameAccess.updateGame(game, req.playerColor(), username);
             return new JoinResult(game.game());
 

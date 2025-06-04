@@ -98,9 +98,7 @@ public class Server {
     }
 
     private Object list(Request req, Response res) throws ParentException {
-        System.out.println("Grabbing info from req...");
         ListRequest listReq = new ListRequest(req.headers("authorization"));
-        System.out.println("Sending to service...");
         return new Gson().toJson(gameService.list(listReq));
     }
 

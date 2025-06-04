@@ -9,7 +9,7 @@ public class PreRepl {
     public void run(ChessClient client) {
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (!result.equals("quit")) {
+        while (!result.equals("quit") && !client.getQuit()) {
             printPrompt();
             String line = scanner.nextLine();
             result = client.preEval(line);
@@ -20,7 +20,7 @@ public class PreRepl {
                 post.run(client, scanner);
             }
         }
-        System.out.println();
+//        System.out.println();
     }
 
     private void printPrompt() {

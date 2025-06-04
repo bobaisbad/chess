@@ -16,6 +16,7 @@ public class ChessClient {
     private boolean gameStatus = false;
     private String userColor = null;
     private ChessGame game = null;
+    private boolean quit = false;
 
     public ChessClient() {
         this.server = new ServerFacade(8080);
@@ -130,7 +131,7 @@ public class ChessClient {
 
     private String join(String[] params) throws ParentException {
         if (params.length == 2) {
-            JoinRequest req = new JoinRequest(params[1], Integer.parseInt(params[0]), username);
+            JoinRequest req = new JoinRequest(params[1], Integer.parseInt(params[0]), authToken);
             JoinResult res = server.join(req);
             gameStatus = true;
             userColor = params[1];
@@ -150,8 +151,7 @@ public class ChessClient {
                    register <USERNAME> <PASSWORD> <EMAIL> - register to create an account
                    login <USERNAME> <PASSWORD> - login to play chess
                    quit - leave the program
-                   help - print out possible commands
-                   """;
+                   help - print out possible commands""";
         } else {
             return """
                    create <GAMENAME> - create a new game
@@ -160,8 +160,7 @@ public class ChessClient {
                    observer <GAMEID> - observe a game in progress
                    logout - logout of your account
                    quit - leave the program
-                   help - print out possible commands
-                   """;
+                   help - print out possible commands""";
         }
     }
 
@@ -171,6 +170,7 @@ public class ChessClient {
         }
         loggedIn = false;
         gameStatus = false;
+        quit = true;
         return "quit";
     }
 
@@ -188,5 +188,9 @@ public class ChessClient {
 
     public ChessGame getGame() {
         return game;
+    }
+
+    public boolean getQuit() {
+        return quit;
     }
 }

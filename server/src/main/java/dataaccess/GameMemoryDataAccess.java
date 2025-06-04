@@ -36,7 +36,7 @@ public class GameMemoryDataAccess implements GameDAO {
 
     public GameData updateGame(GameData game, String playerColor, String username) {
         GameData updatedGame;
-        if (playerColor.equals("WHITE")) {
+        if (playerColor.equals("white")) {
             updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
             games.put(game.gameID(), updatedGame);
         } else {
