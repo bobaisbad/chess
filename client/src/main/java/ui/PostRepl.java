@@ -9,13 +9,14 @@ public class PostRepl {
     public void run(ChessClient client, Scanner scanner) {
         var result = "";
 
-        while (!result.equals("quit") && !result.equals("logout")) {
+        while (!result.equals("quit") && client.getLoginStatus()) {
             printPrompt();
             String line = scanner.nextLine();
             result = client.postEval(line);
             System.out.print(SET_TEXT_COLOR_BLUE + result);
 
             if (client.getGameStatus()) {
+                System.out.print("\n");
                 game.run(client, scanner);
             }
         }

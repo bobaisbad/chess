@@ -93,7 +93,6 @@ public class ChessClient {
             authToken = res.authToken();
             username = res.username();
             loggedIn = true;
-            System.out.println(authToken);
             return "Logged in as " + username;
         }
         throw new ParentException("Expected: <username> <password>", 400);
@@ -163,9 +162,11 @@ public class ChessClient {
     }
 
     private String quit() throws ParentException {
+        if (loggedIn) {
+            logout(new String[] {});
+        }
         loggedIn = false;
         gameStatus = false;
-        logout(new String[] {});
         return "quit";
     }
 

@@ -18,6 +18,7 @@ public class PreRepl {
             System.out.print(SET_TEXT_COLOR_BLUE + result);
 
             if (client.getLoginStatus()) {
+                System.out.print("\n");
                 post.run(client, scanner);
             }
         }

@@ -63,15 +63,10 @@ public class ServerFacade {
 
             writeBody(req, connection, auth);
 
-            System.out.println("Connecting...");
             connection.connect();
-            System.out.println("Connected");
 
-            System.out.println("Handling exceptions...");
             exceptionHandler(connection);
-            System.out.println("Handler");
 
-            System.out.println("Returning read response...");
             return readBody(connection, resClass);
 
         } catch (URISyntaxException | IOException e) {
@@ -85,17 +80,14 @@ public class ServerFacade {
         if (authToken != null) {
             connection.addRequestProperty("authorization", authToken);
         }
-        System.out.println(req);
         String reqData = new Gson().toJson(req);
 
-        System.out.println(reqData);
-
-        try (OutputStream reqBody = connection.getOutputStream()) {
-            reqBody.write(reqData.getBytes());
-            System.out.println("Written");
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            throw new ParentException(e.getMessage(), 500);
+        if (!connection.getRequestMethod().equals("GET")) {
+            try (OutputStream reqBody = connection.getOutputStream()) {
+                reqBody.write(reqData.getBytes());
+            } catch (IOException e) {
+                throw new ParentException(e.getMessage(), 500);
+            }
         }
     }
 
@@ -113,14 +105,11 @@ public class ServerFacade {
     }
 
     private void exceptionHandler(HttpURLConnection connection) throws IOException, ParentException {
-        System.out.println(connection.getResponseCode());
-        System.out.println(connection.getResponseMessage());
         var code = connection.getResponseCode();
         if (code / 100 != 2) {
             try (InputStream exception = connection.getErrorStream()) {
                 if (exception != null) {
                     var map = new Gson().fromJson(new InputStreamReader(exception), HashMap.class);
-                    System.out.println(map);
                     String message = map.get("message").toString();
                     throw new ParentException(message, code);
                 }
