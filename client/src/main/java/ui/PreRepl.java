@@ -1,7 +1,5 @@
 package ui;
 
-import exceptions.ParentException;
-
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
@@ -16,16 +14,16 @@ public class PreRepl {
             String line = scanner.nextLine();
             result = client.preEval(line);
             System.out.print(SET_TEXT_COLOR_BLUE + result);
+            System.out.print("\n");
 
             if (client.getLoginStatus()) {
-                System.out.print("\n");
                 post.run(client, scanner);
             }
         }
         System.out.println();
     }
 
-    public void printPrompt() {
+    private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_OUT] >>> ");
     }
 }

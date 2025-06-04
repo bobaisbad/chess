@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import exceptions.ParentException;
 import request.*;
 import result.*;
@@ -13,6 +14,8 @@ public class ChessClient {
     private final ServerFacade server;
     private boolean loggedIn = false;
     private boolean gameStatus = false;
+    private String userColor = null;
+    private ChessGame game = null;
 
     public ChessClient() {
         this.server = new ServerFacade(8080);
@@ -35,19 +38,18 @@ public class ChessClient {
         }
     }
 
-//    public String gameEval(String input) {
-//        Command cmd = getCommand(input);
-//
-//        try {
-//            return switch (cmd.cmd()) {
-//                default -> help();
-//            };
-//        } catch (ParentException ignore) {
-//            return ex.getMessage();
-//        }
-//
-//        return "";
-//    }
+    public String gameEval(String input) {
+        Command cmd = getCommand(input);
+
+        try {
+            return switch (cmd.cmd()) {
+                case "quit" -> quit();
+                default -> help();
+            };
+        } catch (ParentException ex) {
+            return ex.getMessage();
+        }
+    }
 
     public String postEval(String input) {
         Command cmd = getCommand(input);
@@ -129,8 +131,10 @@ public class ChessClient {
     private String join(String[] params) throws ParentException {
         if (params.length == 2) {
             JoinRequest req = new JoinRequest(params[1], Integer.parseInt(params[0]), username);
-            server.join(req);
+            JoinResult res = server.join(req);
             gameStatus = true;
+            userColor = params[1];
+            game = res.game();
             return "Joined game " + params[0] + " as " + params[1];
         }
         throw new ParentException("Expected: <gameID> <white | black>", 400);
@@ -176,5 +180,13 @@ public class ChessClient {
 
     public boolean getGameStatus() {
         return gameStatus;
+    }
+
+    public String getColor() {
+        return userColor;
+    }
+
+    public ChessGame getGame() {
+        return game;
     }
 }

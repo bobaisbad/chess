@@ -95,7 +95,7 @@ public class GameDatabaseAccess implements GameDAO {
         }
     }
 
-    public void updateGame(GameData game, String playerColor, String username) throws DataAccessException {
+    public GameData updateGame(GameData game, String playerColor, String username) throws DataAccessException {
         String whiteUsername = game.whiteUsername();
         String blackUsername = game.blackUsername();
 
@@ -121,6 +121,8 @@ public class GameDatabaseAccess implements GameDAO {
             ex.printStackTrace();
             throw new DataAccessException("Error: failed to update game", 500);
         }
+
+        return new GameData(game.gameID(), whiteUsername, blackUsername, game.gameName(), game.game());
     }
 
     public void deleteAllGames() throws DataAccessException {

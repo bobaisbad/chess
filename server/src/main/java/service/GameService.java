@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import exceptions.BadRequestException;
 import exceptions.ParentException;
 import exceptions.TakenException;
@@ -52,8 +53,8 @@ public class GameService {
             }
 
             String username = authAccess.getUsername(req.authToken());
-            gameAccess.updateGame(game, req.playerColor(), username);
-            return new JoinResult();
+            game = gameAccess.updateGame(game, req.playerColor(), username);
+            return new JoinResult(game.game());
 
         } else if (req.playerColor().equals("BLACK")) {
             if (game.blackUsername() != null) {
@@ -61,8 +62,8 @@ public class GameService {
             }
 
             String username = authAccess.getUsername(req.authToken());
-            gameAccess.updateGame(game, req.playerColor(), username);
-            return new JoinResult();
+            game = gameAccess.updateGame(game, req.playerColor(), username);
+            return new JoinResult(game.game());
 
         } else {
             throw new BadRequestException("Error: bad request", 400);

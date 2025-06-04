@@ -34,12 +34,16 @@ public class GameMemoryDataAccess implements GameDAO {
         return info;
     }
 
-    public void updateGame(GameData game, String playerColor, String username) {
+    public GameData updateGame(GameData game, String playerColor, String username) {
+        GameData updatedGame;
         if (playerColor.equals("WHITE")) {
-            games.put(game.gameID(), new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game()));
+            updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+            games.put(game.gameID(), updatedGame);
         } else {
-            games.put(game.gameID(), new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game()));
+            updatedGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+            games.put(game.gameID(), updatedGame);
         }
+        return updatedGame;
     }
 
     public void deleteAllGames() {

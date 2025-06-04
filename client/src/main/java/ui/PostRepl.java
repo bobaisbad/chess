@@ -14,16 +14,16 @@ public class PostRepl {
             String line = scanner.nextLine();
             result = client.postEval(line);
             System.out.print(SET_TEXT_COLOR_BLUE + result);
+            System.out.print("\n");
 
             if (client.getGameStatus()) {
-                System.out.print("\n");
                 game.run(client, scanner);
             }
         }
         System.out.println();
     }
 
-    public void printPrompt() {
+    private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_IN] >>> ");
     }
 }
