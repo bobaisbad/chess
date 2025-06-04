@@ -35,8 +35,8 @@ public class ChessClient {
         }
     }
 
-    public String gameEval(String input) {
-        Command cmd = getCommand(input);
+//    public String gameEval(String input) {
+//        Command cmd = getCommand(input);
 //
 //        try {
 //            return switch (cmd.cmd()) {
@@ -45,9 +45,9 @@ public class ChessClient {
 //        } catch (ParentException ignore) {
 //            return ex.getMessage();
 //        }
-
-        return "";
-    }
+//
+//        return "";
+//    }
 
     public String postEval(String input) {
         Command cmd = getCommand(input);
@@ -58,7 +58,7 @@ public class ChessClient {
                 case "create" -> create(cmd.params());
                 case "list" -> list(cmd.params());
                 case "join" -> join(cmd.params());
-                case "observe" -> observe(cmd.params());
+//                case "observe" -> observe(cmd.params());
                 case "quit" -> quit();
                 default -> help();
             };
@@ -137,9 +137,9 @@ public class ChessClient {
         throw new ParentException("Expected: <gameID> <white | black>", 400);
     }
 
-    private String observe(String[] params) throws ParentException {
-        return "";
-    }
+//    private String observe(String[] params) throws ParentException {
+//        return "";
+//    }
 
     private String help() {
         if (!loggedIn) {
@@ -162,10 +162,11 @@ public class ChessClient {
         }
     }
 
-    private String quit() {
+    private String quit() throws ParentException {
         loggedIn = false;
         gameStatus = false;
-        return  "quit";
+        logout(new String[] {});
+        return "quit";
     }
 
     public boolean getLoginStatus() {

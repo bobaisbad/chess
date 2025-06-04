@@ -21,53 +21,58 @@ public class ServerFacade {
 
     public ClearResult clear() throws ParentException {
         var path = "/db";
-        return this.makeHTTP("DELETE", path, null, ClearResult.class);
+        return this.makeHTTP("DELETE", path, null, ClearResult.class, null);
     }
 
     public RegisterResult register(RegisterRequest req) throws ParentException {
         var path = "/user";
-        return this.makeHTTP("POST", path, req, RegisterResult.class);
+        return this.makeHTTP("POST", path, req, RegisterResult.class, null);
     }
 
     public LoginResult login(LoginRequest req) throws ParentException {
         var path = "/session";
-        return this.makeHTTP("POST", path, req, LoginResult.class);
+        return this.makeHTTP("POST", path, req, LoginResult.class, null);
     }
 
     public LogoutResult logout(LogoutRequest req) throws ParentException {
         var path = "/session";
-        return this.makeHTTP("DELETE", path, req, LogoutResult.class);
+        return this.makeHTTP("DELETE", path, req, LogoutResult.class, req.authToken());
     }
 
     public CreateResult create(CreateRequest req) throws ParentException {
         var path = "/game";
-        return this.makeHTTP("POST", path, req, CreateResult.class);
+        return this.makeHTTP("POST", path, req, CreateResult.class, req.authToken());
     }
 
     public ListResult list(ListRequest req) throws ParentException {
         var path = "/game";
-        return this.makeHTTP("GET", path, req, ListResult.class);
+        return this.makeHTTP("GET", path, req, ListResult.class, req.authToken());
     }
 
     public JoinResult join(JoinRequest req) throws ParentException {
         var path = "/game";
-        return this.makeHTTP("PUT", path, req, JoinResult.class);
+        return this.makeHTTP("PUT", path, req, JoinResult.class, req.authToken());
     }
 
-    private <T> T makeHTTP(String method, String path, Object request, Class<T> resultClass) throws ParentException {
+    private <T> T makeHTTP(String method, String path, Object req, Class<T> resClass, String auth) throws ParentException {
         try {
             URL fullURL = (new URI(serverURL + path)).toURL();
             HttpURLConnection connection = (HttpURLConnection) fullURL.openConnection();
             connection.setRequestMethod(method);
             connection.setDoOutput(true);
 
-            writeBody(request, connection);
+            writeBody(req, connection, auth);
 
+            System.out.println("Connecting...");
             connection.connect();
+            System.out.println("Connected");
 
+            System.out.println("Handling exceptions...");
             exceptionHandler(connection);
+            System.out.println("Handler");
 
-            return readBody(connection, resultClass);
+            System.out.println("Returning read response...");
+            return readBody(connection, resClass);
 
         } catch (URISyntaxException | IOException e) {
             throw new ParentException(e.getMessage(), 500);
@@ -75,13 +80,21 @@ public class ServerFacade {
 
     }
 
-    private void writeBody(Object req, HttpURLConnection connection) throws ParentException {
+    private void writeBody(Object req, HttpURLConnection connection, String authToken) throws ParentException {
         connection.addRequestProperty("Content-Type", "application/json");
+        if (authToken != null) {
+            connection.addRequestProperty("authorization", authToken);
+        }
+        System.out.println(req);
         String reqData = new Gson().toJson(req);
+
+        System.out.println(reqData);
 
         try (OutputStream reqBody = connection.getOutputStream()) {
             reqBody.write(reqData.getBytes());
+            System.out.println("Written");
         } catch (IOException e) {
+            System.out.println(e.getMessage());
             throw new ParentException(e.getMessage(), 500);
         }
     }
@@ -100,14 +113,14 @@ public class ServerFacade {
     }
 
     private void exceptionHandler(HttpURLConnection connection) throws IOException, ParentException {
-//        System.out.println(connection.getResponseCode());
-//        System.out.println(connection.getResponseMessage());
+        System.out.println(connection.getResponseCode());
+        System.out.println(connection.getResponseMessage());
         var code = connection.getResponseCode();
         if (code / 100 != 2) {
             try (InputStream exception = connection.getErrorStream()) {
                 if (exception != null) {
                     var map = new Gson().fromJson(new InputStreamReader(exception), HashMap.class);
-//                    System.out.println(map);
+                    System.out.println(map);
                     String message = map.get("message").toString();
                     throw new ParentException(message, code);
                 }
