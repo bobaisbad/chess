@@ -19,7 +19,7 @@ public class GameRepl {
         this.game = client.getGame();
         System.out.print("\n");
 
-        while (!result.equals("quit") && !client.getQuit() && !result.equals("leave")) {
+        while (!client.getQuit() && client.getGameStatus()) {
             if (client.getColor().equals("black")) {
                 printBoardBlack(out);
             } else {

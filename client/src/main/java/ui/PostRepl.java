@@ -9,7 +9,7 @@ public class PostRepl {
     public void run(ChessClient client, Scanner scanner) {
         var result = "";
 
-        while (!result.equals("quit") && client.getLoginStatus() && !client.getQuit()) {
+        while (client.getLoginStatus() && !client.getQuit()) {
             printPrompt();
             String line = scanner.nextLine();
             result = client.postEval(line);
