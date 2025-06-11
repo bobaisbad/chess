@@ -16,7 +16,6 @@ public class GameRepl {
     public void run(ChessClient client, Scanner scanner) {
         var result = "";
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        this.game = client.getGame();
         System.out.print("\n");
 
         while (!client.getQuit() && client.getGameStatus()) {
@@ -24,6 +23,8 @@ public class GameRepl {
                 resigned(client, scanner, out);
                 break;
             }
+
+            this.game = client.getGame();
 
             if (client.getColor().equals("black")) {
                 printBoardBlack(out);
@@ -51,6 +52,7 @@ public class GameRepl {
         var result = "";
 
         while (client.getGameStatus()) {
+            this.game = client.getGame();
             printBoardWhite(out);
             printPrompt();
             String line = scanner.nextLine();

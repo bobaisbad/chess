@@ -92,6 +92,7 @@ public class ChessClient {
             return switch (cmd.cmd()) {
                 case "quit" -> quit();
                 case "leave" -> leave();
+                case "redraw" -> "";
                 default -> help();
             };
         } catch (ParentException ex) {
@@ -209,10 +210,14 @@ public class ChessClient {
 
     private String observe(String[] params) throws ParentException {
         if (params.length == 1) {
-//            int gameID = (listedGames.get(params[0]) == null) ? 0: listedGames.get(params[0]);
+            int gameID = (listedGames.get(params[0]) == null) ? 0: listedGames.get(params[0]);
             gameStatus = true;
             resigned = true;
-            return "Observing game " + params[0];
+            handler = (handler == null) ? new WSRepl() : handler;
+            ws = new WebSocketFacade(serverURL, handler);
+            ws.joinGame(authToken, userColor, gameID);
+            return "";
+//            return "Observing game " + params[0];
         }
         throw new ParentException("Expected <game#>", 400);
     }
@@ -250,6 +255,7 @@ public class ChessClient {
                    help - print out possible commands""";
         } else if (resigned) {
                 return """
+                   redraw - redraws the chess board
                    leave - leave the current game
                    quit - leave the program
                    help - print out possible commands""";
