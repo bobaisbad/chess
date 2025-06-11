@@ -269,8 +269,9 @@ public class ChessClient {
             return "resign";
         } else if (params[0].equals("y")) {
             resigned = true;
-
         }
+
+        return "";
     }
 
     public boolean getLoginStatus() {
