@@ -1,13 +1,15 @@
 package websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.AuthDAO;
+import dataaccess.GameDAO;
 import dataaccess.UserDAO;
-import dataaccess.UserDatabaseAccess;
 import exceptions.DataAccessException;
-import org.eclipse.jetty.server.Authentication;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import service.UserService;
+import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -17,9 +19,13 @@ public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
     private final UserDAO userAccess;
+    private final GameDAO gameAccess;
+    private final AuthDAO authAccess;
 
-    public WebSocketHandler(UserDAO userAccess) {
+    public WebSocketHandler(UserDAO userAccess, GameDAO gameAccess, AuthDAO authAccess) {
         this.userAccess = userAccess;
+        this.gameAccess = gameAccess;
+        this.authAccess = authAccess;
     }
 
     @OnWebSocketMessage
@@ -27,7 +33,8 @@ public class WebSocketHandler {
         UserGameCommand cmd = new Gson().fromJson(message, UserGameCommand.class);
         switch (cmd.getCommandType()) {
             case CONNECT -> connect(cmd.getAuthToken(), cmd.getColor(), session);
-//            case MAKE_MOVE -> ;
+//            case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getMove(), cmd.getGameID(), session);
+            case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getGame(), cmd.getGameID(), cmd.getMove(), session);
 //            case LEAVE -> ;
 //            case RESIGN -> ;
         }
@@ -46,7 +53,13 @@ public class WebSocketHandler {
         connections.broadcast(authToken, serverMsg);
     }
 
-    private void move() {
-        //
+    private void move(String authToken, ChessGame game, int gameID, MoveCommand move,
+                      Session session) throws DataAccessException, IOException {
+        if (!authAccess.validateAuth(authToken)) {
+            gameAccess.updateGameState(gameID, game);
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "");
+            serverMsg.setGame(game);
+            connections.broadcast("", serverMsg);
+        }
     }
 }

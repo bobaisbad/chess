@@ -42,7 +42,7 @@ public class Server {
         this.gameService = new GameService(authAccess, gameAccess);
         this.clearService = new ClearService(authAccess, gameAccess, userAccess);
 
-        this.handler = new WebSocketHandler(userService.getUserAccess());
+        this.handler = new WebSocketHandler(userAccess, gameAccess, authAccess);
     }
 
     public int run(int desiredPort) {

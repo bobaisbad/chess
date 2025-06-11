@@ -95,6 +95,26 @@ public class GameDatabaseAccess implements GameDAO {
         }
     }
 
+    public void updateGameState(int gameID, ChessGame game) throws DataAccessException {
+        String stmt = "UPDATE games " +
+                      "SET game = ? " +
+                      "WHERE gameID = ?";
+
+        var jsonGame = new Gson().toJson(game);
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var prepStmt = conn.prepareStatement(stmt)) {
+                prepStmt.setString(1, jsonGame);
+                prepStmt.setInt(2, gameID);
+
+                prepStmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new DataAccessException("Error: failed to update game", 500);
+        }
+    }
+
     public GameData updateGame(GameData game, String playerColor, String username) throws DataAccessException {
         String whiteUsername = game.whiteUsername();
         String blackUsername = game.blackUsername();

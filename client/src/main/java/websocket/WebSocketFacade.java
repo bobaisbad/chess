@@ -1,7 +1,9 @@
 package websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exceptions.ParentException;
+import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -39,10 +41,21 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
     public void joinGame(String authToken, String color, int gameID) throws ParentException {
+        var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+        command.setColor(color);
+        sendCmd(command);
+    }
+
+    public void makeMove(String authToken, int gameID, ChessGame game, MoveCommand move) throws ParentException {
+        var command = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID);
+        command.setMove(move);
+        command.setGame(game);
+        sendCmd(command);
+    }
+
+    private void sendCmd(UserGameCommand cmd) throws ParentException {
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
-            command.setColor(color);
-            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
         } catch (IOException ex) {
             throw new ParentException(ex.getMessage(), 500);
         }

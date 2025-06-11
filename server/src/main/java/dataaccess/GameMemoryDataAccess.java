@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import exceptions.DataAccessException;
 import model.GameData;
 import model.GameInfo;
 import java.util.Collection;
@@ -49,4 +50,6 @@ public class GameMemoryDataAccess implements GameDAO {
     public void deleteAllGames() {
         games.clear();
     }
+
+    public void updateGameState(int gameID, ChessGame game) throws DataAccessException {}
 }
