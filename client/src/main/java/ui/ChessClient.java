@@ -18,6 +18,7 @@ public class ChessClient {
     private String userColor = null;
     private ChessGame game = null;
     private boolean quit = false;
+    private boolean resigned = false;
     private HashMap<String, Integer> listedGames = new HashMap<>();
 
     public ChessClient() {
@@ -48,6 +49,10 @@ public class ChessClient {
             return switch (cmd.cmd()) {
                 case "quit" -> quit();
                 case "leave" -> leave();
+                case "redraw" -> "";
+//                case "move" -> move(cmd.params());
+                case "resign" -> resign(cmd.params());
+//                case "highlight" -> highlight(cmd.params());
                 default -> help();
             };
         } catch (ParentException ex) {
@@ -66,6 +71,20 @@ public class ChessClient {
                 case "join" -> join(cmd.params());
                 case "observe" -> observe(cmd.params());
                 case "quit" -> quit();
+                default -> help();
+            };
+        } catch (ParentException ex) {
+            return ex.getMessage();
+        }
+    }
+
+    public String resignedEval(String input) {
+        Command cmd = getCommand(input);
+
+        try {
+            return switch (cmd.cmd()) {
+                case "quit" -> quit();
+                case "leave" -> leave();
                 default -> help();
             };
         } catch (ParentException ex) {
@@ -124,8 +143,6 @@ public class ChessClient {
         throw new ParentException("Expected nothing", 400);
     }
 
-    // leave, observe the board, and join non-existant game
-
     private String create(String[] params) throws ParentException {
         if (params.length == 1) {
             CreateRequest req = new CreateRequest(params[0], authToken);
@@ -166,6 +183,7 @@ public class ChessClient {
                 JoinRequest req = new JoinRequest(params[1], gameID, authToken);
                 JoinResult res = server.join(req);
                 gameStatus = true;
+                resigned = false;
                 userColor = params[1];
                 game = res.game();
                 return "Joined game " + params[0] + " as " + params[1];
@@ -182,6 +200,7 @@ public class ChessClient {
         if (params.length == 1) {
 //            int gameID = (listedGames.get(params[0]) == null) ? 0: listedGames.get(params[0]);
             gameStatus = true;
+            resigned = true;
             return "Observing game " + params[0];
         }
         throw new ParentException("Expected <game#>", 400);
@@ -194,13 +213,35 @@ public class ChessClient {
                    login <USERNAME> <PASSWORD> - login to play chess
                    quit - leave the program
                    help - print out possible commands""";
-        } else {
+        } else if (!gameStatus) {
             return """
                    create <GAMENAME> - create a new game
                    list - list all games and who's playing
                    join <GAME#> <WHITE | BLACK> - join and play a chess game
                    observe <GAME#> - observe a game in progress
                    logout - logout of your account
+                   quit - leave the program
+                   help - print out possible commands""";
+        } else if (resigned) {
+                return """
+                   leave - leave the current game
+                   quit - leave the program
+                   help - print out possible commands""";
+        } else {
+//            return """
+//                   redraw chess board - redraws the chess board
+//                   leave - leave the current game
+//                   make move <PIECE> <MOVE> - select and move a piece
+//                   resign - forfeit and end the game
+//                   highlight legal moves <PIECE> - highlights where the selected piece can move
+//                   quit - leave the program
+//                   help - print out possible commands""";
+            return """
+                   redraw - redraws the chess board
+                   leave - leave the current game
+                   move <PIECE> <MOVE> - select and move a piece
+                   resign - forfeit and end the game
+                   highlight <PIECE> - highlights where the selected piece can move
                    quit - leave the program
                    help - print out possible commands""";
         }
@@ -212,13 +253,24 @@ public class ChessClient {
         }
         loggedIn = false;
         gameStatus = false;
+        resigned = false;
         quit = true;
         return "quit";
     }
 
     private String leave() {
         gameStatus = false;
+        resigned = false;
         return "Leaving the game...";
+    }
+
+    private String resign(String[] params) {
+        if (params.length == 0) {
+            return "resign";
+        } else if (params[0].equals("y")) {
+            resigned = true;
+
+        }
     }
 
     public boolean getLoginStatus() {
@@ -239,5 +291,9 @@ public class ChessClient {
 
     public boolean getQuit() {
         return quit;
+    }
+
+    public boolean getResigned() {
+        return resigned;
     }
 }

@@ -20,6 +20,11 @@ public class GameRepl {
         System.out.print("\n");
 
         while (!client.getQuit() && client.getGameStatus()) {
+            if (client.getResigned()) {
+                resigned(client, scanner, out);
+                break;
+            }
+
             if (client.getColor().equals("black")) {
                 printBoardBlack(out);
             } else {
@@ -29,6 +34,27 @@ public class GameRepl {
             printPrompt();
             String line = scanner.nextLine();
             result = client.gameEval(line);
+
+            if (result.equals("resign")) {
+                System.out.print(SET_TEXT_COLOR_BLUE + "Are you sure you want to resign and end the game? (y/n)");
+                printPrompt();
+                line = scanner.nextLine();
+                client.gameEval("resign " + line);
+            } else {
+                System.out.print(SET_TEXT_COLOR_BLUE + result);
+                System.out.print("\n");
+            }
+        }
+    }
+
+    private void resigned(ChessClient client, Scanner scanner, PrintStream out) {
+        var result = "";
+
+        while (client.getGameStatus()) {
+            printBoardWhite(out);
+            printPrompt();
+            String line = scanner.nextLine();
+            result = client.resignedEval(line);
             System.out.print(SET_TEXT_COLOR_BLUE + result);
             System.out.print("\n");
         }
