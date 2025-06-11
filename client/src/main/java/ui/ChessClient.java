@@ -6,6 +6,9 @@ import model.GameInfo;
 import request.*;
 import result.*;
 import server.ServerFacade;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
+
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -19,10 +22,14 @@ public class ChessClient {
     private ChessGame game = null;
     private boolean quit = false;
     private boolean resigned = false;
-    private HashMap<String, Integer> listedGames = new HashMap<>();
+    private WebSocketFacade ws;
+    private final String serverURL;
+    private NotificationHandler handler;
+    private final HashMap<String, Integer> listedGames = new HashMap<>();
 
     public ChessClient() {
         this.server = new ServerFacade(8080);
+        this.serverURL = "http://localhost:" + 8080;
         PreRepl pre = new PreRepl();
         pre.run(this);
     }
@@ -186,6 +193,9 @@ public class ChessClient {
                 resigned = false;
                 userColor = params[1];
                 game = res.game();
+                handler = new WSRepl();
+                ws = new WebSocketFacade(serverURL, handler);
+                ws.joinGame(authToken, gameID);
                 return "Joined game " + params[0] + " as " + params[1];
             }
             throw new ParentException("Expected: <game#> <white | black>", 400);
@@ -205,6 +215,21 @@ public class ChessClient {
         }
         throw new ParentException("Expected <game#>", 400);
     }
+
+//    private String move(String[] params) throws ParentException {
+//        try {
+//            if (params.length == 2) {
+//                //
+//            }
+//            throw new ParentException("Expected <piece> <move>", 400);
+//        } catch (ParentException ex) {
+//            throw new ParentException(ex.getMessage(), 400);
+//        }
+//    }
+//
+//    private String highlight(String[] params) throws ParentException {
+//        //
+//    }
 
     private String help() {
         if (!loggedIn) {

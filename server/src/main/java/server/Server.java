@@ -8,11 +8,13 @@ import result.ClearResult;
 import service.*;
 import spark.*;
 import com.google.gson.Gson;
+import websocket.WebSocketHandler;
 
 public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final ClearService clearService;
+    private final WebSocketHandler handler;
 
     public Server() {
         try {
@@ -39,12 +41,16 @@ public class Server {
         this.userService = new UserService(authAccess, userAccess);
         this.gameService = new GameService(authAccess, gameAccess);
         this.clearService = new ClearService(authAccess, gameAccess, userAccess);
+
+        this.handler = new WebSocketHandler(userService.getUserAccess());
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/ws", handler);
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clear);
