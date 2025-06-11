@@ -16,6 +16,8 @@ public class UserGameCommand {
 
     private final Integer gameID;
 
+    private String color;
+
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;
         this.authToken = authToken;
@@ -39,6 +41,14 @@ public class UserGameCommand {
 
     public Integer getGameID() {
         return gameID;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getColor() {
+        return this.color;
     }
 
     @Override

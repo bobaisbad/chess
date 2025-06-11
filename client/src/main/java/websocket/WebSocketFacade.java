@@ -38,9 +38,10 @@ public class WebSocketFacade extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
-    public void joinGame(String authToken, int gameID) throws ParentException {
+    public void joinGame(String authToken, String color, int gameID) throws ParentException {
         try {
             var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            command.setColor(color);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new ParentException(ex.getMessage(), 500);

@@ -37,4 +37,13 @@ public class ConnectionManager {
             connections.remove(c.getAuthToken());
         }
     }
+
+    public void send(String authToken, ServerMessage msg) throws IOException {
+        Connection c = connections.get(authToken);
+        if (c.getSession().isOpen()) {
+            c.send(new Gson().toJson(msg));
+        } else {
+            connections.remove(c.getAuthToken());
+        }
+    }
 }

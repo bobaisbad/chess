@@ -193,10 +193,11 @@ public class ChessClient {
                 resigned = false;
                 userColor = params[1];
                 game = res.game();
-                handler = new WSRepl();
+                handler = (handler == null) ? new WSRepl() : handler;
                 ws = new WebSocketFacade(serverURL, handler);
-                ws.joinGame(authToken, gameID);
-                return "Joined game " + params[0] + " as " + params[1];
+                ws.joinGame(authToken, userColor, gameID);
+                return "";
+//                return "Joined game " + params[0] + " as " + params[1];
             }
             throw new ParentException("Expected: <game#> <white | black>", 400);
         } catch (ParentException ex) {
