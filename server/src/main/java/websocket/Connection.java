@@ -8,10 +8,12 @@ public class Connection {
 
     private final String authToken;
     private final Session session;
+    private final int gameID;
 
-    public Connection (String authToken, Session session) {
+    public Connection (String authToken, Session session, int gameID) {
         this.authToken = authToken;
         this.session = session;
+        this.gameID = gameID;
     }
 
     public void send(String msg) throws IOException {
@@ -24,5 +26,9 @@ public class Connection {
 
     public Session getSession() {
         return this.session;
+    }
+
+    public int getGameID() {
+        return this.gameID;
     }
 }

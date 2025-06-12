@@ -32,16 +32,16 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException, DataAccessException {
         UserGameCommand cmd = new Gson().fromJson(message, UserGameCommand.class);
         switch (cmd.getCommandType()) {
-            case CONNECT -> connect(cmd.getAuthToken(), cmd.getColor(), session);
+            case CONNECT -> connect(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor(), session);
 //            case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getMove(), cmd.getGameID(), session);
-            case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getGame(), cmd.getGameID(), cmd.getMove(), session);
+            case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getGame(), cmd.getGameID(), cmd.getMove());
 //            case LEAVE -> ;
 //            case RESIGN -> ;
         }
     }
 
-    private void connect(String authToken, String color, Session session) throws DataAccessException, IOException {
-        connections.add(authToken, session);
+    private void connect(int gameID, String authToken, String color, Session session) throws DataAccessException, IOException {
+        connections.add(authToken, session, gameID);
         String username = userAccess.getUser(authToken).username();
 
         String msg = "You just joined the game as " + ((color != null) ? color : "an observer");
@@ -50,38 +50,37 @@ public class WebSocketHandler {
         ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg);
         connections.send(authToken, serverMsg);
         serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
-        connections.broadcast(authToken, serverMsg);
+        connections.broadcast(gameID, authToken, serverMsg);
     }
 
-    private void move(String authToken, ChessGame game, int gameID, MoveCommand move,
-                      Session session) throws DataAccessException, IOException {
+    private void move(String authToken, ChessGame game, int gameID, MoveCommand move) throws DataAccessException, IOException {
         if (!authAccess.validateAuth(authToken)) {
             gameAccess.updateGameState(gameID, game);
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "");
             serverMsg.setGame(game);
-            connections.broadcast("", serverMsg);
+            connections.broadcast(gameID, "", serverMsg);
 
             String username = userAccess.getUser(authToken).username();
             String notification = username + " moved " + move.start() + " to " + move.end();
             serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
-            connections.broadcast(authToken, serverMsg);
+            connections.broadcast(gameID, authToken, serverMsg);
 
             String enemy = (move.color().equals("white")) ? "Black" : "White";
             if (move.check() && !move.mate() && !move.stale()) { // check
                 notification = enemy + " is in check!";
                 serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
-                connections.broadcast("", serverMsg);
+                connections.broadcast(gameID, "", serverMsg);
             } else if (move.check() && move.mate() && !move.stale()) { // checkmate
                 notification = enemy + " is in checkmate!";
                 serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
                 serverMsg.setGameOver(true);
                 serverMsg.setWinner(move.color());
-                connections.broadcast("", serverMsg);
+                connections.broadcast(gameID, "", serverMsg);
             } else if (!move.check() && move.mate() && move.stale()) { // stalemate
                 notification = "Stalemate!";
                 serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
                 serverMsg.setGameOver(true);
-                connections.broadcast("", serverMsg);
+                connections.broadcast(gameID, "", serverMsg);
             }
         }
     }
