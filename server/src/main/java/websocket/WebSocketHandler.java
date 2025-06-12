@@ -35,7 +35,7 @@ public class WebSocketHandler {
             case CONNECT -> connect(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor(), session);
 //            case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getMove(), cmd.getGameID(), session);
             case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getGame(), cmd.getGameID(), cmd.getMove());
-//            case LEAVE -> ;
+            case LEAVE -> leave(cmd.getGameID(), cmd.getColor(), cmd.getAuthToken());
 //            case RESIGN -> ;
         }
     }
@@ -83,5 +83,16 @@ public class WebSocketHandler {
                 connections.broadcast(gameID, "", serverMsg);
             }
         }
+    }
+
+    public void leave(int gameID, String color, String authToken) throws DataAccessException, IOException {
+        GameData data = gameAccess.getGame(gameID);
+        gameAccess.updateGame(data, color, null);
+
+        String username = (color.equals("white")) ? data.whiteUsername() : data.blackUsername();
+        String notification = username + " as " + color + " just left the game";
+        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+        connections.broadcast(gameID, authToken, serverMsg);
+        connections.remove(authToken);
     }
 }

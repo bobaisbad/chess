@@ -53,6 +53,17 @@ public class WebSocketFacade extends Endpoint {
         sendCmd(command);
     }
 
+    public void leave(String authToken, int gameID, String color) throws ParentException {
+        try {
+            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            command.setColor(color);
+            sendCmd(command);
+            session.close();
+        } catch (IOException ex) {
+            throw new ParentException(ex.getMessage(), 500);
+        }
+    }
+
     private void sendCmd(UserGameCommand cmd) throws ParentException {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(cmd));

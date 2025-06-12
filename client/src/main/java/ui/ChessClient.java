@@ -312,6 +312,9 @@ public class ChessClient {
     }
 
     private String quit() throws ParentException {
+        if (gameStatus) {
+            leave();
+        }
         if (loggedIn) {
             logout(new String[] {});
         }
@@ -322,9 +325,10 @@ public class ChessClient {
         return "quit";
     }
 
-    private String leave() {
+    private String leave() throws ParentException {
         gameStatus = false;
         resigned = false;
+        ws.leave(authToken, gameID, userColor);
         return "Leaving the game...";
     }
 
