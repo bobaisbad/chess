@@ -44,28 +44,46 @@ public class WebSocketHandler {
     private void connect(int gameID, String authToken, String color, Session session) throws DataAccessException, IOException {
         connections.add(authToken, session, gameID);
         String username = authAccess.getUsername(authToken);
-        ChessGame game = gameAccess.getGame(gameID).game();
 
-//        String msg = "You just joined the game as " + ((color != null) ? color : "an observer");
+        if (username == null) {
+            String error = "Error: invalid authToken";
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
+            connections.send(authToken, serverMsg);
+            connections.remove(authToken);
+            return;
+        }
+
+        GameData data = gameAccess.getGame(gameID);
+
+        if (data == null) {
+            String error = "Error: invalid gameID";
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
+            connections.send(authToken, serverMsg);
+            connections.remove(authToken);
+            return;
+        }
+
+        ChessGame game = data.game();
+
         String notification = username + " just joined the game as " + ((color != null) ? color : "an observer");
 
-        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null);
+        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, null);
         serverMsg.setGame(game);
         connections.send(authToken, serverMsg);
-        serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+        serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
         connections.broadcast(gameID, authToken, serverMsg);
     }
 
     private void move(String authToken, ChessGame game, int gameID, MoveCommand move) throws DataAccessException, IOException {
         if (!authAccess.validateAuth(authToken)) {
             gameAccess.updateGameState(gameID, game);
-            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "");
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, null);
             serverMsg.setGame(game);
             connections.broadcast(gameID, "", serverMsg);
 
             String username = authAccess.getUsername(authToken);
             String notification = username + " moved " + move.start() + " to " + move.end();
-            serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+            serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
             connections.broadcast(gameID, authToken, serverMsg);
 
             GameData data = gameAccess.getGame(gameID);
@@ -73,17 +91,17 @@ public class WebSocketHandler {
 
             if (move.check() && !move.mate() && !move.stale()) { // check
                 notification = enemy + " is in check!";
-                serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+                serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
                 connections.broadcast(gameID, "", serverMsg);
             } else if (move.check() && move.mate() && !move.stale()) { // checkmate
                 notification = enemy + " is in checkmate!";
-                serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+                serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
                 serverMsg.setGameOver(true);
                 serverMsg.setWinner(move.color());
                 connections.broadcast(gameID, "", serverMsg);
             } else if (!move.check() && move.mate() && move.stale()) { // stalemate
                 notification = "Stalemate!";
-                serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+                serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
                 serverMsg.setGameOver(true);
                 connections.broadcast(gameID, "", serverMsg);
             }
@@ -96,14 +114,14 @@ public class WebSocketHandler {
 
         String username = (color.equals("white")) ? data.whiteUsername() : data.blackUsername();
         String notification = username + " as " + color + " left the game";
-        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
         connections.broadcast(gameID, authToken, serverMsg);
         connections.remove(authToken);
     }
 
     private void resign(int gameID, String authToken, ChessGame game, String color) throws DataAccessException, IOException {
         gameAccess.updateGameState(gameID, game);
-        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "");
+        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, null);
         serverMsg.setGame(game);
         connections.broadcast(gameID, "", serverMsg);
 
@@ -111,9 +129,9 @@ public class WebSocketHandler {
         String notification = username + " as " + color + " resigned the game";
         String msg = "You resigned the game as " + color;
 
-        serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg, null);
         connections.send(authToken, serverMsg);
-        serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+        serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
         connections.broadcast(gameID, authToken, serverMsg);
     }
 }

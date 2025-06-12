@@ -17,6 +17,9 @@ public class ConnectionManager {
     }
 
     public void remove(String authToken) {
+        if (connections.get(authToken).getSession().isOpen()) {
+            connections.get(authToken).getSession().close();
+        }
         connections.remove(authToken);
     }
 
