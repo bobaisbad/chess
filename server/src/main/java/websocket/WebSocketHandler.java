@@ -60,6 +60,29 @@ public class WebSocketHandler {
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "");
             serverMsg.setGame(game);
             connections.broadcast("", serverMsg);
+
+            String username = userAccess.getUser(authToken).username();
+            String notification = username + " moved " + move.start() + " to " + move.end();
+            serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+            connections.broadcast(authToken, serverMsg);
+
+            String enemy = (move.color().equals("white")) ? "Black" : "White";
+            if (move.check() && !move.mate() && !move.stale()) { // check
+                notification = enemy + " is in check!";
+                serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+                connections.broadcast("", serverMsg);
+            } else if (move.check() && move.mate() && !move.stale()) { // checkmate
+                notification = enemy + " is in checkmate!";
+                serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+                serverMsg.setGameOver(true);
+                serverMsg.setWinner(move.color());
+                connections.broadcast("", serverMsg);
+            } else if (!move.check() && move.mate() && move.stale()) { // stalemate
+                notification = "Stalemate!";
+                serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+                serverMsg.setGameOver(true);
+                connections.broadcast("", serverMsg);
+            }
         }
     }
 }

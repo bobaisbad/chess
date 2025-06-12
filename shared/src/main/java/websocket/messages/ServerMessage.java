@@ -14,6 +14,8 @@ public class ServerMessage {
     ServerMessageType serverMessageType;
     String serverMessage;
     ChessGame game;
+    boolean gameOver = false;
+    String winner;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -40,6 +42,22 @@ public class ServerMessage {
 
     public ChessGame getGame() {
         return this.game;
+    }
+
+    public void setGameOver(boolean bool) {
+        this.gameOver = bool;
+    }
+
+    public boolean getGameOver() {
+        return this.gameOver;
+    }
+
+    public void setWinner(String winner) {
+        this.winner = winner;
+    }
+
+    public String getWinner() {
+        return this.winner;
     }
 
     @Override

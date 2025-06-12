@@ -231,10 +231,18 @@ public class ChessClient {
                 ChessPosition end = new ChessPosition(params[1].charAt(0) - 96, params[1].charAt(1));
                 ChessMove move = new ChessMove(start, end, null);
                 game.makeMove(move);
-                MoveCommand moveCmd = new MoveCommand(params[0], params[1]);
+
+                ChessGame.TeamColor team = (userColor.equals("white")) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+                boolean check = game.isInCheck(team);
+                boolean mate = game.isInCheckmate(team);
+                boolean stale = game.isInStalemate(team);
+                MoveCommand moveCmd = new MoveCommand(params[0], params[1], userColor, check, mate, stale);
+                // f t t = stale
+                // t f f = check
+                // t t f = mate
 
                 ws.makeMove(authToken, gameID, game, moveCmd);
-
+                return "";
             } // else if (params.length == 3) {
 //                ChessPiece.PieceType type = switch (params[2]) {
 //                    case "queen" -> ChessPiece.PieceType.QUEEN;
@@ -360,5 +368,9 @@ public class ChessClient {
 
     public void setHandler(NotificationHandler handler) {
         this.handler = handler;
+    }
+
+    public void setResigned(boolean bool) {
+        resigned = bool;
     }
 }
