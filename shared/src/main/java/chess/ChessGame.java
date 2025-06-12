@@ -92,7 +92,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (gameOver) {
-            return;
+            throw new InvalidMoveException();
         }
 
         if (board.getPiece(move.getStartPosition()) == null ||

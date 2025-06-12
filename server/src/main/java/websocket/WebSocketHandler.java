@@ -1,8 +1,6 @@
 package websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
@@ -90,10 +88,24 @@ public class WebSocketHandler {
         GameData data = gameAccess.getGame(gameID);
         ChessGame game = data.game();
 
+        ChessPosition start = move.getStartPosition();
+        ChessPiece piece = game.getBoard().getPiece(start);
+        String pieceColor = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? "white" : "black";
+
+        if (!pieceColor.equals(color)) {
+            String error = "Error: invalid move";
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
+            connections.send(authToken, serverMsg);
+            return;
+        }
+
         try {
             game.makeMove(move);
         } catch (InvalidMoveException e) {
-            throw new ParentException("Error: invalid move", 400);
+            String error = "Error: invalid move";
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
+            connections.send(authToken, serverMsg);
+            return;
         }
 
         gameAccess.updateGameState(gameID, game);

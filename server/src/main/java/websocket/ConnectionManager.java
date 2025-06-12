@@ -43,9 +43,9 @@ public class ConnectionManager {
 
     public void send(String authToken, ServerMessage msg) throws IOException {
         Connection c = connections.get(authToken);
-        if (c.getSession().isOpen()) {
+        if (c != null && c.getSession().isOpen()) {
             c.send(new Gson().toJson(msg));
-        } else {
+        } else if (c != null) {
             connections.remove(c.getAuthToken());
         }
     }
