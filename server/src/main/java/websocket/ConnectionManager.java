@@ -12,8 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void add(String authToken, Session session, int gameID) {
-        Connection connection = new Connection(authToken, session, gameID);
+    public void add(String authToken, Session session, int gameID, String username) {
+        Connection connection = new Connection(authToken, session, gameID, username);
         connections.put(authToken, connection);
     }
 
@@ -42,11 +42,25 @@ public class ConnectionManager {
         }
     }
 
-    public void send(String authToken, ServerMessage msg) throws IOException, ParentException {
+    public void send(String authToken, Session session, ServerMessage msg) throws IOException, ParentException {
         Connection c = connections.get(authToken);
-        if (c != null && c.getSession().isOpen()) {
+
+        if (c == null) {
+            for (var con : connections.values()) {
+                if (con.getSession() == session) {
+                    c = con;
+                    break;
+                }
+            }
+
+            if (c == null) {
+                return;
+            }
+        }
+
+        if (c.getSession().isOpen()) {
             c.send(new Gson().toJson(msg));
-        } else if (c != null) {
+        } else {
             connections.remove(c.getAuthToken());
         }
     }

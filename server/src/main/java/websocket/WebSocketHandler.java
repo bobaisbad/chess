@@ -36,20 +36,20 @@ public class WebSocketHandler {
         UserGameCommand cmd = new Gson().fromJson(message, UserGameCommand.class);
         switch (cmd.getCommandType()) {
             case CONNECT -> connect(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor(), session);
-            case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove(), cmd.getColor());
-            case LEAVE -> leave(cmd.getGameID(), cmd.getColor(), cmd.getAuthToken());
-            case RESIGN -> resign(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor());
+            case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove(), cmd.getColor(), session);
+            case LEAVE -> leave(cmd.getGameID(), cmd.getColor(), cmd.getAuthToken(), session);
+            case RESIGN -> resign(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor(), session);
         }
     }
 
     private void connect(int gameID, String authToken, String color, Session session) throws ParentException, IOException {
-        connections.add(authToken, session, gameID);
         String username = authAccess.getUsername(authToken);
+        connections.add(authToken, session, gameID, username);
 
         if (username == null) {
             String error = "Error: invalid authToken";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
-            connections.send(authToken, serverMsg);
+            connections.send(authToken, null, serverMsg);
             connections.remove(authToken);
             return;
         }
@@ -59,7 +59,7 @@ public class WebSocketHandler {
         if (data == null) {
             String error = "Error: invalid gameID";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
-            connections.send(authToken, serverMsg);
+            connections.send(authToken, session, serverMsg);
             connections.remove(authToken);
             return;
         }
@@ -70,22 +70,20 @@ public class WebSocketHandler {
 
         ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, null);
         serverMsg.setGame(game);
-        connections.send(authToken, serverMsg);
+        connections.send(authToken, session, serverMsg);
         serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
         connections.broadcast(gameID, authToken, serverMsg);
     }
 
-    private void move(String authToken, int gameID, ChessMove move, String color) throws ParentException, IOException {
-//        String username = authAccess.getUsername(authToken);
+    private void move(String authToken, int gameID, ChessMove move, String color, Session session) throws ParentException, IOException {
+        String username = authAccess.getUsername(authToken);
 
         if (authAccess.validateAuth(authToken)) {
             String error = "Error: invalid authToken";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
-            connections.send(authToken, serverMsg);
+            connections.send(authToken, session, serverMsg);
             return;
         }
-
-        String username = authAccess.getUsername(authToken);
 
         GameData data = gameAccess.getGame(gameID);
         ChessGame game = data.game();
@@ -93,7 +91,7 @@ public class WebSocketHandler {
         if (game == null || game.getGameOver()) {
             String error = "Error: the game is over";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
-            connections.send(authToken, serverMsg);
+            connections.send(authToken, session, serverMsg);
             return;
         }
 
@@ -101,10 +99,16 @@ public class WebSocketHandler {
         ChessPiece piece = game.getBoard().getPiece(start);
         String pieceColor = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? "white" : "black";
 
+        if (username.equals(data.whiteUsername())) {
+            color = "white";
+        } else if (username.equals(data.blackUsername())) {
+            color = "black";
+        }
+
         if (!pieceColor.equals(color)) {
             String error = "Error: invalid move";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
-            connections.send(authToken, serverMsg);
+            connections.send(authToken, session, serverMsg);
             return;
         }
 
@@ -113,7 +117,7 @@ public class WebSocketHandler {
         } catch (InvalidMoveException e) {
             String error = "Error: invalid move";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
-            connections.send(authToken, serverMsg);
+            connections.send(authToken, session, serverMsg);
             return;
         }
 
@@ -151,18 +155,33 @@ public class WebSocketHandler {
         }
     }
 
-    private void leave(int gameID, String color, String authToken) throws DataAccessException, IOException {
-        GameData data = gameAccess.getGame(gameID);
-        gameAccess.updateGame(data, color, null);
+    private void leave(int gameID, String color, String authToken, Session session) throws ParentException, IOException {
+        String username = authAccess.getUsername(authToken);
 
-        String username = (color.equals("white")) ? data.whiteUsername() : data.blackUsername();
+        if (authAccess.validateAuth(authToken)) {
+            String error = "Error: invalid authToken";
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
+            connections.send(authToken, session, serverMsg);
+            return;
+        }
+
+        GameData data = gameAccess.getGame(gameID);
+
+        if (username.equals(data.whiteUsername())) {
+            gameAccess.updateGame(data, "white", null);
+        } else if (username.equals(data.blackUsername())) {
+            gameAccess.updateGame(data, "black", null);
+        }
+
         String notification = username + " as " + color + " left the game";
         ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
         connections.broadcast(gameID, authToken, serverMsg);
         connections.remove(authToken);
     }
 
-    private void resign(int gameID, String authToken, String color) throws ParentException, IOException {
+    private void resign(int gameID, String authToken, String color, Session session) throws ParentException, IOException {
+        String username = authAccess.getUsername(authToken);
+
 //        gameAccess.updateGameState(gameID, game);
 //        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, null);
 //        serverMsg.setGame(game);
@@ -170,22 +189,21 @@ public class WebSocketHandler {
         if (authAccess.validateAuth(authToken)) {
             String error = "Error: invalid authToken";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
-            connections.send(authToken, serverMsg);
+            connections.send(authToken, session, serverMsg);
             return;
         }
 
         GameData data = gameAccess.getGame(gameID);
-        String username = authAccess.getUsername(authToken);
 
         if (!username.equals(data.blackUsername()) && !username.equals(data.whiteUsername())) {
             String error = "Error: an observer can't resign the game";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
-            connections.send(authToken, serverMsg);
+            connections.send(authToken, session, serverMsg);
             return;
         } else if (data.game().getGameOver()) {
             String error = "Error: the game is over";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
-            connections.send(authToken, serverMsg);
+            connections.send(authToken, session, serverMsg);
             return;
         }
 
@@ -196,7 +214,7 @@ public class WebSocketHandler {
         String msg = "You resigned the game as " + color;
 
         ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg, null);
-        connections.send(authToken, serverMsg);
+        connections.send(authToken, session, serverMsg);
         serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
         connections.broadcast(gameID, authToken, serverMsg);
     }

@@ -9,11 +9,13 @@ public class Connection {
     private final String authToken;
     private final Session session;
     private final int gameID;
+    private final String username;
 
-    public Connection (String authToken, Session session, int gameID) {
+    public Connection (String authToken, Session session, int gameID, String username) {
         this.authToken = authToken;
         this.session = session;
         this.gameID = gameID;
+        this.username = username;
     }
 
     public void send(String msg) throws IOException {
@@ -30,5 +32,9 @@ public class Connection {
 
     public int getGameID() {
         return this.gameID;
+    }
+
+    public String getUsername() {
+        return this.username;
     }
 }

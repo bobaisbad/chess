@@ -20,21 +20,22 @@ public class ChessClient {
     private boolean loggedIn = false;
     private boolean gameStatus = false;
     private String userColor = null;
-//    private ChessGame game = null;
+    private ChessGame game = null;
     private int gameID;
     private boolean quit = false;
     private boolean resigned = false;
     private WebSocketFacade ws;
     private final String serverURL;
+    private final PreRepl pre;
     private NotificationHandler handler;
     private final HashMap<String, Integer> listedGames = new HashMap<>();
 
     public ChessClient() {
         this.server = new ServerFacade(8080);
         this.serverURL = "http://localhost:" + 8080;
-        PreRepl pre = new PreRepl();
+        this.pre = new PreRepl();
         pre.run(this);
-        this.handler = pre.getGameRepl();
+//        this.handler = pre.getGameRepl();
     }
 
     public String preEval(String input) {
@@ -192,13 +193,13 @@ public class ChessClient {
             if (params.length == 2) {
                 gameID = (listedGames.get(params[0]) == null) ? 0: listedGames.get(params[0]);
                 JoinRequest req = new JoinRequest(params[1], gameID, authToken);
-//                JoinResult res = server.join(req);
+                JoinResult res = server.join(req);
                 server.join(req);
                 gameStatus = true;
                 resigned = false;
                 userColor = params[1];
-//                game = res.game();
-//                handler = (handler == null) ? new WSRepl(this) : handler;
+                game = res.game();
+                handler = (handler == null) ? pre.getGameRepl() : handler;
                 ws = new WebSocketFacade(serverURL, handler);
                 ws.joinGame(authToken, userColor, gameID);
                 return "";
@@ -217,7 +218,7 @@ public class ChessClient {
             gameID = (listedGames.get(params[0]) == null) ? 0: listedGames.get(params[0]);
             gameStatus = true;
             resigned = true;
-//            handler = (handler == null) ? new WSRepl(this) : handler;
+            handler = (handler == null) ? pre.getGameRepl() : handler;
             ws = new WebSocketFacade(serverURL, handler);
             ws.joinGame(authToken, userColor, gameID);
             return "";
@@ -356,9 +357,9 @@ public class ChessClient {
         return userColor;
     }
 
-//    public ChessGame getGame() {
-//        return game;
-//    }
+    public ChessGame getGame() {
+        return game;
+    }
 
     public boolean getQuit() {
         return quit;
