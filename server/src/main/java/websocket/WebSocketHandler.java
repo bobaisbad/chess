@@ -33,16 +33,15 @@ public class WebSocketHandler {
         UserGameCommand cmd = new Gson().fromJson(message, UserGameCommand.class);
         switch (cmd.getCommandType()) {
             case CONNECT -> connect(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor(), session);
-//            case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getMove(), cmd.getGameID(), session);
             case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getGame(), cmd.getGameID(), cmd.getMove());
             case LEAVE -> leave(cmd.getGameID(), cmd.getColor(), cmd.getAuthToken());
-//            case RESIGN -> ;
+            case RESIGN -> resign(cmd.getGameID(), cmd.getAuthToken(), cmd.getGame(), cmd.getColor());
         }
     }
 
     private void connect(int gameID, String authToken, String color, Session session) throws DataAccessException, IOException {
         connections.add(authToken, session, gameID);
-        String username = userAccess.getUser(authToken).username();
+        String username = authAccess.getUsername(authToken);
 
         String msg = "You just joined the game as " + ((color != null) ? color : "an observer");
         String notification = username + " just joined the game as " + ((color != null) ? color : "an observer");
@@ -60,12 +59,14 @@ public class WebSocketHandler {
             serverMsg.setGame(game);
             connections.broadcast(gameID, "", serverMsg);
 
-            String username = userAccess.getUser(authToken).username();
+            String username = authAccess.getUsername(authToken);
             String notification = username + " moved " + move.start() + " to " + move.end();
             serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
             connections.broadcast(gameID, authToken, serverMsg);
 
-            String enemy = (move.color().equals("white")) ? "Black" : "White";
+            GameData data = gameAccess.getGame(gameID);
+            String enemy = (move.color().equals("white")) ? data.blackUsername() : data.whiteUsername();
+
             if (move.check() && !move.mate() && !move.stale()) { // check
                 notification = enemy + " is in check!";
                 serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
@@ -85,14 +86,30 @@ public class WebSocketHandler {
         }
     }
 
-    public void leave(int gameID, String color, String authToken) throws DataAccessException, IOException {
+    private void leave(int gameID, String color, String authToken) throws DataAccessException, IOException {
         GameData data = gameAccess.getGame(gameID);
         gameAccess.updateGame(data, color, null);
 
         String username = (color.equals("white")) ? data.whiteUsername() : data.blackUsername();
-        String notification = username + " as " + color + " just left the game";
+        String notification = username + " as " + color + " left the game";
         ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
         connections.broadcast(gameID, authToken, serverMsg);
         connections.remove(authToken);
+    }
+
+    private void resign(int gameID, String authToken, ChessGame game, String color) throws DataAccessException, IOException {
+        gameAccess.updateGameState(gameID, game);
+        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, "");
+        serverMsg.setGame(game);
+        connections.broadcast(gameID, "", serverMsg);
+
+        String username = authAccess.getUsername(authToken);
+        String notification = username + " as " + color + " resigned the game";
+        String msg = "You resigned the game as " + color;
+
+        serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        connections.send(authToken, serverMsg);
+        serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+        connections.broadcast(gameID, authToken, serverMsg);
     }
 }

@@ -15,6 +15,7 @@ public class ChessGame {
     private ChessBoard board = new ChessBoard();
     private final ChessPosition blackKingPosition;
     private final ChessPosition whiteKingPosition;
+    private boolean gameOver = false;
 
     public ChessGame() {
         board.resetBoard();
@@ -90,6 +91,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (gameOver) {
+            return;
+        }
+
         if (board.getPiece(move.getStartPosition()) == null ||
             board.getPiece(move.getStartPosition()).getTeamColor() != team) {
             throw new InvalidMoveException();
@@ -202,6 +207,7 @@ public class ChessGame {
             }
         }
 
+        this.gameOver = true;
         return true;
     }
 
@@ -259,6 +265,10 @@ public class ChessGame {
                 blackKingPosition.setCol(position.getColumn());
             }
         }
+    }
+
+    public void setGameOver(boolean bool) {
+        this.gameOver = bool;
     }
 
     @Override

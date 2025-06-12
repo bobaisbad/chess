@@ -332,11 +332,13 @@ public class ChessClient {
         return "Leaving the game...";
     }
 
-    private String resign(String[] params) {
+    private String resign(String[] params) throws ParentException {
         if (params.length == 0) {
             return "resign";
         } else if (params[0].equals("y")) {
             resigned = true;
+            game.setGameOver(true);
+            ws.resign(authToken, gameID, game);
         }
 
         return "";

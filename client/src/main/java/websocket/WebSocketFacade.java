@@ -64,6 +64,13 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void resign(String authToken, int gameID, ChessGame game) throws ParentException {
+        var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+//        command.setColor(color);
+        command.setGame(game);
+        sendCmd(command);
+    }
+
     private void sendCmd(UserGameCommand cmd) throws ParentException {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
