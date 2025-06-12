@@ -31,7 +31,7 @@ public class GameRepl implements NotificationHandler {
                 break;
             }
 
-            this.game = client.getGame();
+//            this.game = client.getGame();
 
             if (client.getColor().equals("black")) {
                 printBoardBlack(out);
@@ -59,7 +59,7 @@ public class GameRepl implements NotificationHandler {
         var result = "";
 
         while (client.getGameStatus()) {
-            this.game = client.getGame();
+//            this.game = client.getGame();
             printBoardWhite(out);
             printPrompt();
             String line = scanner.nextLine();
@@ -71,8 +71,9 @@ public class GameRepl implements NotificationHandler {
 
     public void notify(ServerMessage msg) {
         if (msg.getGame() != null) {
-            client.setGame(msg.getGame());
-            this.game = client.getGame();
+//            client.setGame(msg.getGame());
+//            this.game = client.getGame();
+            this.game = msg.getGame();
         }
 
         if (msg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
@@ -88,6 +89,7 @@ public class GameRepl implements NotificationHandler {
         if (msg.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             if (msg.getGameOver()) {
                 client.setResigned(true);
+                game.setGameOver(true);
                 if (client.getColor().equals(msg.getWinner())) {
                     System.out.println(SET_TEXT_COLOR_RED + "You won!");
                 }

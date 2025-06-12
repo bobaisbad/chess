@@ -67,10 +67,10 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void resign(String authToken, int gameID, ChessGame game) throws ParentException {
+    public void resign(String authToken, int gameID) throws ParentException {
         var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
 //        command.setColor(color);
-        command.setGame(game);
+//        command.setGame(game);
         sendCmd(command);
     }
 

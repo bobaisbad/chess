@@ -271,6 +271,10 @@ public class ChessGame {
         this.gameOver = bool;
     }
 
+    public boolean getGameOver() {
+        return this.gameOver;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

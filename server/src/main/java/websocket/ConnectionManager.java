@@ -1,6 +1,7 @@
 package websocket;
 
 import com.google.gson.Gson;
+import exceptions.ParentException;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
@@ -41,7 +42,7 @@ public class ConnectionManager {
         }
     }
 
-    public void send(String authToken, ServerMessage msg) throws IOException {
+    public void send(String authToken, ServerMessage msg) throws IOException, ParentException {
         Connection c = connections.get(authToken);
         if (c != null && c.getSession().isOpen()) {
             c.send(new Gson().toJson(msg));

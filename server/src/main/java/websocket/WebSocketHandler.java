@@ -38,11 +38,11 @@ public class WebSocketHandler {
             case CONNECT -> connect(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor(), session);
             case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove(), cmd.getColor());
             case LEAVE -> leave(cmd.getGameID(), cmd.getColor(), cmd.getAuthToken());
-            case RESIGN -> resign(cmd.getGameID(), cmd.getAuthToken(), cmd.getGame(), cmd.getColor());
+            case RESIGN -> resign(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor());
         }
     }
 
-    private void connect(int gameID, String authToken, String color, Session session) throws DataAccessException, IOException {
+    private void connect(int gameID, String authToken, String color, Session session) throws ParentException, IOException {
         connections.add(authToken, session, gameID);
         String username = authAccess.getUsername(authToken);
 
@@ -76,17 +76,26 @@ public class WebSocketHandler {
     }
 
     private void move(String authToken, int gameID, ChessMove move, String color) throws ParentException, IOException {
-        String username = authAccess.getUsername(authToken);
+//        String username = authAccess.getUsername(authToken);
 
-        if (username == null) {
+        if (authAccess.validateAuth(authToken)) {
             String error = "Error: invalid authToken";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
             connections.send(authToken, serverMsg);
             return;
         }
 
+        String username = authAccess.getUsername(authToken);
+
         GameData data = gameAccess.getGame(gameID);
         ChessGame game = data.game();
+
+        if (game == null || game.getGameOver()) {
+            String error = "Error: the game is over";
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
+            connections.send(authToken, serverMsg);
+            return;
+        }
 
         ChessPosition start = move.getStartPosition();
         ChessPiece piece = game.getBoard().getPiece(start);
@@ -131,13 +140,13 @@ public class WebSocketHandler {
         } else if (check && mate && !stale) { // checkmate
             notification = enemy + " is in checkmate!";
             serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
-            serverMsg.setGameOver(true);
+//            serverMsg.setGameOver(true);
             serverMsg.setWinner(color);
             connections.broadcast(gameID, "", serverMsg);
         } else if (!check && mate && stale) { // stalemate
             notification = "Stalemate!";
             serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
-            serverMsg.setGameOver(true);
+//            serverMsg.setGameOver(true);
             connections.broadcast(gameID, "", serverMsg);
         }
     }
@@ -153,17 +162,40 @@ public class WebSocketHandler {
         connections.remove(authToken);
     }
 
-    private void resign(int gameID, String authToken, ChessGame game, String color) throws DataAccessException, IOException {
-        gameAccess.updateGameState(gameID, game);
-        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, null);
-        serverMsg.setGame(game);
-        connections.broadcast(gameID, "", serverMsg);
+    private void resign(int gameID, String authToken, String color) throws ParentException, IOException {
+//        gameAccess.updateGameState(gameID, game);
+//        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, null);
+//        serverMsg.setGame(game);
+//        connections.broadcast(gameID, authToken, serverMsg);
+        if (authAccess.validateAuth(authToken)) {
+            String error = "Error: invalid authToken";
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
+            connections.send(authToken, serverMsg);
+            return;
+        }
 
+        GameData data = gameAccess.getGame(gameID);
         String username = authAccess.getUsername(authToken);
+
+        if (!username.equals(data.blackUsername()) && !username.equals(data.whiteUsername())) {
+            String error = "Error: an observer can't resign the game";
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
+            connections.send(authToken, serverMsg);
+            return;
+        } else if (data.game().getGameOver()) {
+            String error = "Error: the game is over";
+            ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
+            connections.send(authToken, serverMsg);
+            return;
+        }
+
+        data.game().setGameOver(true);
+        gameAccess.updateGameState(gameID, data.game());
+
         String notification = username + " as " + color + " resigned the game";
         String msg = "You resigned the game as " + color;
 
-        serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg, null);
+        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg, null);
         connections.send(authToken, serverMsg);
         serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
         connections.broadcast(gameID, authToken, serverMsg);

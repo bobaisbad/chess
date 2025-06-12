@@ -20,7 +20,7 @@ public class ChessClient {
     private boolean loggedIn = false;
     private boolean gameStatus = false;
     private String userColor = null;
-    private ChessGame game = null;
+//    private ChessGame game = null;
     private int gameID;
     private boolean quit = false;
     private boolean resigned = false;
@@ -337,8 +337,8 @@ public class ChessClient {
             return "resign";
         } else if (params[0].equals("y")) {
             resigned = true;
-            game.setGameOver(true);
-            ws.resign(authToken, gameID, game);
+//            game.setGameOver(true);
+            ws.resign(authToken, gameID);
         }
 
         return "";
@@ -356,9 +356,9 @@ public class ChessClient {
         return userColor;
     }
 
-    public ChessGame getGame() {
-        return game;
-    }
+//    public ChessGame getGame() {
+//        return game;
+//    }
 
     public boolean getQuit() {
         return quit;
@@ -368,9 +368,9 @@ public class ChessClient {
         return resigned;
     }
 
-    public void setGame(ChessGame game) {
-        this.game = game;
-    }
+//    public void setGame(ChessGame game) {
+//        this.game = game;
+//    }
 
 //    public void setHandler(NotificationHandler handler) {
 //        this.handler = handler;
