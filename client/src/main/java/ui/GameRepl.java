@@ -19,7 +19,7 @@ public class GameRepl implements NotificationHandler {
 
     public void run(ChessClient client, Scanner scanner) {
         this.client = client;
-        client.setHandler(this);
+//        client.setHandler(this);
 
         var result = "";
         this.out = (out == null) ? new PrintStream(System.out, true, StandardCharsets.UTF_8) : out;

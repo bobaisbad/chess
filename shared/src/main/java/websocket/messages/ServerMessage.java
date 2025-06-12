@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
-    String serverMessage;
+    String message;
     ChessGame game;
     boolean gameOver = false;
     String winner;
@@ -25,7 +25,7 @@ public class ServerMessage {
 
     public ServerMessage(ServerMessageType type, String message) {
         this.serverMessageType = type;
-        this.serverMessage = message;
+        this.message = message;
     }
 
     public ServerMessageType getServerMessageType() {
@@ -33,7 +33,7 @@ public class ServerMessage {
     }
 
     public String getServerMessage() {
-        return this.serverMessage;
+        return this.message;
     }
 
     public void setGame(ChessGame game) {

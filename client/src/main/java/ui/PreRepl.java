@@ -26,4 +26,8 @@ public class PreRepl {
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_OUT] >>> ");
     }
+
+    public GameRepl getGameRepl() {
+        return post.getGameRepl();
+    }
 }

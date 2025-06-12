@@ -34,6 +34,7 @@ public class ChessClient {
         this.serverURL = "http://localhost:" + 8080;
         PreRepl pre = new PreRepl();
         pre.run(this);
+        this.handler = pre.getGameRepl();
     }
 
     public String preEval(String input) {
@@ -196,7 +197,7 @@ public class ChessClient {
                 resigned = false;
                 userColor = params[1];
                 game = res.game();
-                handler = (handler == null) ? new WSRepl(this) : handler;
+//                handler = (handler == null) ? new WSRepl(this) : handler;
                 ws = new WebSocketFacade(serverURL, handler);
                 ws.joinGame(authToken, userColor, gameID);
                 return "";
@@ -215,7 +216,7 @@ public class ChessClient {
             gameID = (listedGames.get(params[0]) == null) ? 0: listedGames.get(params[0]);
             gameStatus = true;
             resigned = true;
-            handler = (handler == null) ? new WSRepl(this) : handler;
+//            handler = (handler == null) ? new WSRepl(this) : handler;
             ws = new WebSocketFacade(serverURL, handler);
             ws.joinGame(authToken, userColor, gameID);
             return "";
@@ -328,7 +329,7 @@ public class ChessClient {
     private String leave() throws ParentException {
         gameStatus = false;
         resigned = false;
-        ws.leave(authToken, gameID, userColor);
+        ws.leave(authToken, gameID, userColor, game);
         return "Leaving the game...";
     }
 
@@ -372,9 +373,9 @@ public class ChessClient {
         this.game = game;
     }
 
-    public void setHandler(NotificationHandler handler) {
-        this.handler = handler;
-    }
+//    public void setHandler(NotificationHandler handler) {
+//        this.handler = handler;
+//    }
 
     public void setResigned(boolean bool) {
         resigned = bool;

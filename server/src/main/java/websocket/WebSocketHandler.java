@@ -9,12 +9,14 @@ import exceptions.DataAccessException;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
+@WebSocket
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
@@ -42,11 +44,13 @@ public class WebSocketHandler {
     private void connect(int gameID, String authToken, String color, Session session) throws DataAccessException, IOException {
         connections.add(authToken, session, gameID);
         String username = authAccess.getUsername(authToken);
+        ChessGame game = gameAccess.getGame(gameID).game();
 
-        String msg = "You just joined the game as " + ((color != null) ? color : "an observer");
+//        String msg = "You just joined the game as " + ((color != null) ? color : "an observer");
         String notification = username + " just joined the game as " + ((color != null) ? color : "an observer");
 
-        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg);
+        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null);
+        serverMsg.setGame(game);
         connections.send(authToken, serverMsg);
         serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
         connections.broadcast(gameID, authToken, serverMsg);

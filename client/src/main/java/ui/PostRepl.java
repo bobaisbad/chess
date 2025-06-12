@@ -26,4 +26,8 @@ public class PostRepl {
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_IN] >>> ");
     }
+
+    public GameRepl getGameRepl() {
+        return game;
+    }
 }
