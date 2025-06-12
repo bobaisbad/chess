@@ -1,6 +1,7 @@
 package websocket.commands;
 
 import chess.ChessGame;
+import chess.ChessMove;
 
 import java.util.Objects;
 
@@ -19,7 +20,7 @@ public class UserGameCommand {
     private final Integer gameID;
 
     private String color;
-    private MoveCommand move;
+    private ChessMove move;
     private ChessGame game;
 
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
@@ -55,11 +56,11 @@ public class UserGameCommand {
         return this.color;
     }
 
-    public void setMove(MoveCommand move) {
+    public void setMove(ChessMove move) {
         this.move = move;
     }
 
-    public MoveCommand getMove() {
+    public ChessMove getMove() {
         return this.move;
     }
 

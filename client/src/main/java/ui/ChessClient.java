@@ -192,11 +192,12 @@ public class ChessClient {
             if (params.length == 2) {
                 gameID = (listedGames.get(params[0]) == null) ? 0: listedGames.get(params[0]);
                 JoinRequest req = new JoinRequest(params[1], gameID, authToken);
-                JoinResult res = server.join(req);
+//                JoinResult res = server.join(req);
+                server.join(req);
                 gameStatus = true;
                 resigned = false;
                 userColor = params[1];
-                game = res.game();
+//                game = res.game();
 //                handler = (handler == null) ? new WSRepl(this) : handler;
                 ws = new WebSocketFacade(serverURL, handler);
                 ws.joinGame(authToken, userColor, gameID);
@@ -231,18 +232,18 @@ public class ChessClient {
                 ChessPosition start = new ChessPosition(params[0].charAt(0) - 96, params[0].charAt(1));
                 ChessPosition end = new ChessPosition(params[1].charAt(0) - 96, params[1].charAt(1));
                 ChessMove move = new ChessMove(start, end, null);
-                game.makeMove(move);
+//                game.makeMove(move);
 
-                ChessGame.TeamColor team = (userColor.equals("white")) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
-                boolean check = game.isInCheck(team);
-                boolean mate = game.isInCheckmate(team);
-                boolean stale = game.isInStalemate(team);
-                MoveCommand moveCmd = new MoveCommand(params[0], params[1], userColor, check, mate, stale);
+//                ChessGame.TeamColor team = (userColor.equals("white")) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+//                boolean check = game.isInCheck(team);
+//                boolean mate = game.isInCheckmate(team);
+//                boolean stale = game.isInStalemate(team);
+//                MoveCommand moveCmd = new MoveCommand(move, userColor);
                 // f t t = stale
                 // t f f = check
                 // t t f = mate
 
-                ws.makeMove(authToken, gameID, game, moveCmd);
+                ws.makeMove(authToken, gameID, move, userColor);
                 return "";
             } // else if (params.length == 3) {
 //                ChessPiece.PieceType type = switch (params[2]) {
@@ -261,8 +262,6 @@ public class ChessClient {
             throw new ParentException("Expected <piece> <move>", 400);
         } catch (ParentException ex) {
             throw new ParentException(ex.getMessage(), 400);
-        } catch (InvalidMoveException e) {
-            throw new ParentException("Error: invalid move", 400);
         }
     }
 
@@ -329,7 +328,7 @@ public class ChessClient {
     private String leave() throws ParentException {
         gameStatus = false;
         resigned = false;
-        ws.leave(authToken, gameID, userColor, game);
+        ws.leave(authToken, gameID, userColor);
         return "Leaving the game...";
     }
 
