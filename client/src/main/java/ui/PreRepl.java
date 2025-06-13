@@ -20,7 +20,6 @@ public class PreRepl {
                 post.run(client, scanner);
             }
         }
-//        System.out.println();
     }
 
     private void printPrompt() {

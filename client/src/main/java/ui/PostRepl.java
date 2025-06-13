@@ -20,7 +20,6 @@ public class PostRepl {
                 game.run(client, scanner);
             }
         }
-//        System.out.println();
     }
 
     private void printPrompt() {

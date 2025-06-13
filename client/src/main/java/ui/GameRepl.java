@@ -19,7 +19,6 @@ public class GameRepl implements NotificationHandler {
 
         var result = "";
         this.out = (out == null) ? new PrintStream(System.out, true, StandardCharsets.UTF_8) : out;
-//        System.out.print("\n");
 
         while (!client.getQuit() && client.getGameStatus()) {
             if (client.getResigned()) {
@@ -27,26 +26,9 @@ public class GameRepl implements NotificationHandler {
                 break;
             }
 
-//            this.game = (game == null) ? client.getGame() : game;
-//            this.game = client.getGame();
-//
-//            if (client.getColor().equals("black")) {
-//                printBoardBlack(out);
-//            } else {
-//                printBoardWhite(out);
-//            }
-
-//            printPrompt();
-//            try {
-//                wait(1000);
-//            } catch (InterruptedException ex) {
-//                System.out.print("");
-//            }
-
             printPrompt();
             String line = scanner.nextLine();
             result = client.gameEval(line);
-//            System.out.print(SET_TEXT_COLOR_BLUE + result);
 
             if (result.equals("resign")) {
                 System.out.print(SET_TEXT_COLOR_BLUE + "Are you sure you want to resign and end the game? (y/n)");
@@ -62,36 +44,15 @@ public class GameRepl implements NotificationHandler {
                 }
             } else {
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
-//                System.out.print("\n");
             }
-
-//            if (line.equalsIgnoreCase("help")) {
-//                System.out.print("\n");
-//                printPrompt();
-//            }
         }
     }
 
     public void notify(ServerMessage msg) {
         if (msg.getGame() != null) {
             client.setGame(msg.getGame());
-//            this.game = client.getGame();
             this.game = msg.getGame();
         }
-
-//        if (msg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-//            if (client.getColor().equals("black")) {
-//                printBoardBlack(out);
-//            } else {
-//                printBoardWhite(out);
-//            }
-//        }
-
-//        if (client.getColor() == null || client.getColor().equals("white")) {
-//            printBoardWhite(out);
-//        } else {
-//            printBoardBlack(out);
-//        }
 
         if (msg.getServerMessage() != null) {
             System.out.print(SET_TEXT_COLOR_RED + msg.getServerMessage() + "\n");
@@ -111,26 +72,16 @@ public class GameRepl implements NotificationHandler {
                 }
             }
         }
-
-//        if (client.getColor() == null || client.getColor().equals("white")) {
-//            printBoardWhite(out);
-//        } else {
-//            printBoardBlack(out);
-//        }
-
-//        printPrompt();
     }
 
     private void resigned(ChessClient client, Scanner scanner, PrintStream out) {
         var result = "";
 
         while (client.getGameStatus()) {
-//            this.game = client.getGame();
-//            printBoardWhite(out);
-//            printPrompt();
             String line = scanner.nextLine();
             result = client.resignedEval(line);
             System.out.print(SET_TEXT_COLOR_BLUE + result);
+
             if (line.equalsIgnoreCase("help")) {
                 System.out.print("\n");
                 printPrompt();
@@ -159,24 +110,6 @@ public class GameRepl implements NotificationHandler {
         drawRows(out, numbers, ascii, moves);
         drawLetters(out, letters);
     }
-
-//    public void printWhiteSimBoard(ChessMove[] moves) {
-//        String[] letters = {" a\u2003", " b\u2003", " c\u2003", " d\u2003", " e\u2003", " f\u2003", " g\u2003", " h\u2003"};
-//        drawLetters(out, letters);
-//        char[] ascii = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
-//        int[] numbers = {8, 7, 6, 5, 4, 3, 2, 1};
-//        drawRows(out, numbers, ascii, moves);
-//        drawLetters(out, letters);
-//    }
-//
-//    public void printBlackSimBoard(ChessMove[] moves) {
-//        String[] letters = {" h\u2003", " g\u2003", " f\u2003", " e\u2003", " d\u2003", " c\u2003", " b\u2003", " a\u2003"};
-//        drawLetters(out, letters);
-//        char[] ascii = {'h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'};
-//        int[] numbers = {1, 2, 3 , 4 , 5, 6, 7, 8};
-//        drawRows(out, numbers, ascii, moves);
-//        drawLetters(out, letters);
-//    }
 
     private void drawLetters(PrintStream out, String[] letters) {
         setGray(out);
@@ -248,53 +181,6 @@ public class GameRepl implements NotificationHandler {
         }
     }
 
-//    private void drawSimRows(PrintStream out, int[] numbers, char[] letters, ChessMove[] moves) {
-//        ChessBoard board = game.getBoard();
-//        ChessPosition position = new ChessPosition(1, 1);
-//
-//        for (int i = 0; i < 8; i++) { // Rows
-//            setGray(out);
-//            out.print(SET_TEXT_COLOR_BLACK);
-//            out.print(SET_TEXT_BOLD);
-//            out.print("\u2003" + numbers[i] + " ");
-//            out.print(RESET_TEXT_BOLD_FAINT);
-//            for (int j = 0; j < 8; j++) { // Columns
-//                if (j % 2 == 0 && i % 2 == 0) {
-//                    setTan(out);
-//                } else if (j % 2 == 1 && i % 2 == 1) {
-//                    setTan(out);
-//                } else {
-//                    setBrown(out);
-//                }
-//
-//                for (ChessMove move : moves) {
-//                    if (move.getEndPosition().getRow() - 1 == i && move.getEndPosition().getColumn() - 1 == j) {
-//                        setGreen(out);
-//                    }
-//                }
-//
-//                position.setCol(letters[j] - 96);
-//                position.setRow(numbers[i]);
-//                ChessPiece piece = board.getPiece(position);
-//
-//                if (piece == null) {
-//                    out.print(EMPTY);
-//                } else {
-//                    out.print(SET_TEXT_COLOR_BLACK);
-//                    String type = getPieceType(piece);
-//                    out.print(type);
-//                }
-//            }
-//            setGray(out);
-//            out.print(SET_TEXT_COLOR_BLACK);
-//            out.print(SET_TEXT_BOLD);
-//            out.print(" " + numbers[i] + "\u2003");
-//            out.print(RESET_TEXT_BOLD_FAINT);
-//            setDefault(out);
-//            out.println();
-//        }
-//    }
-
     private void setGray(PrintStream out) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_LIGHT_GREY);
@@ -344,35 +230,5 @@ public class GameRepl implements NotificationHandler {
         } else {
             return (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_KING : BLACK_KING;
         }
-
-//        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-//            if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-//                return WHITE_PAWN;
-//            } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-//                return WHITE_ROOK;
-//            } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
-//                return WHITE_KNIGHT;
-//            } else if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-//                return WHITE_BISHOP;
-//            } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
-//                return WHITE_QUEEN;
-//            } else {
-//                return WHITE_KING;
-//            }
-//        } else {
-//            if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-//                return BLACK_PAWN;
-//            } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-//                return BLACK_ROOK;
-//            } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
-//                return BLACK_KNIGHT;
-//            } else if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-//                return BLACK_BISHOP;
-//            } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
-//                return BLACK_QUEEN;
-//            } else {
-//                return BLACK_KING;
-//            }
-//        }
     }
 }

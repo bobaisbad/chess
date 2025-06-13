@@ -8,9 +8,6 @@ import result.*;
 import server.ServerFacade;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
-import websocket.messages.ServerMessage;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -36,7 +33,6 @@ public class ChessClient {
         this.serverURL = "http://localhost:" + 8080;
         this.pre = new PreRepl();
         pre.run(this);
-//        this.handler = pre.getGameRepl();
     }
 
     public String preEval(String input) {
@@ -214,7 +210,6 @@ public class ChessClient {
                 ws = new WebSocketFacade(serverURL, handler);
                 ws.joinGame(authToken, userColor, gameID);
                 return "";
-//                return "Joined game " + params[0] + " as " + params[1];
             }
             throw new ParentException("Expected: <game#> <white | black>", 400);
         } catch (ParentException ex) {
@@ -233,7 +228,6 @@ public class ChessClient {
             ws = new WebSocketFacade(serverURL, handler);
             ws.joinGame(authToken, userColor, gameID);
             return "";
-//            return "Observing game " + params[0];
         }
         throw new ParentException("Expected <game#>", 400);
     }
@@ -257,7 +251,6 @@ public class ChessClient {
     private String highlight(String[] params) throws ParentException {
         if (params.length == 1) {
             ChessPosition pos = new ChessPosition((int) params[0].charAt(1) - 48, (int) params[0].charAt(0) - 96);
-//            Chessgame.getBoard().getPiece(pos);
             ChessMove[] moves = (game.validMoves(pos) == null) ? new ChessMove[0] : game.validMoves(pos).toArray(new ChessMove[0]);
 
             if (userColor.equals("white") || userColor == null) {
@@ -294,14 +287,6 @@ public class ChessClient {
                    quit - leave the program
                    help - print out possible commands""";
         } else {
-//            return """
-//                   redraw chess board - redraws the chess board
-//                   leave - leave the current game
-//                   make move <PIECE> <MOVE> - select and move a piece
-//                   resign - forfeit and end the game
-//                   highlight legal moves <PIECE> - highlights where the selected piece can move
-//                   quit - leave the program
-//                   help - print out possible commands""";
             return """
                    redraw - redraws the chess board
                    leave - leave the current game
@@ -339,16 +324,11 @@ public class ChessClient {
             return "resign";
         } else if (params[0].equals("y")) {
             resigned = true;
-//            game.setGameOver(true);
             ws.resign(authToken, gameID);
         }
 
         return "";
     }
-
-//    private String redraw() {
-//        return "draw";
-//    }
 
     public boolean getLoginStatus() {
         return loggedIn;
@@ -362,10 +342,6 @@ public class ChessClient {
         return userColor;
     }
 
-//    public ChessGame getGame() {
-//        return game;
-//    }
-
     public boolean getQuit() {
         return quit;
     }
@@ -377,10 +353,6 @@ public class ChessClient {
     public void setGame(ChessGame game) {
         this.game = game;
     }
-
-//    public void setHandler(NotificationHandler handler) {
-//        this.handler = handler;
-//    }
 
     public void setResigned(boolean bool) {
         resigned = bool;

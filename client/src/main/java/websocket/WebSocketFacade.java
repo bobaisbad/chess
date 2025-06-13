@@ -1,10 +1,8 @@
 package websocket;
 
-import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import exceptions.ParentException;
-import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -51,22 +49,17 @@ public class WebSocketFacade extends Endpoint {
         var command = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID);
         command.setMove(move);
         command.setColor(color);
-//        command.setGame(game);
         sendCmd(command);
     }
 
     public void leave(String authToken, int gameID, String color) throws ParentException {
         var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
         command.setColor(color);
-//            command.setGame(game);
         sendCmd(command);
-//            session.close();
     }
 
     public void resign(String authToken, int gameID) throws ParentException {
         var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
-//        command.setColor(color);
-//        command.setGame(game);
         sendCmd(command);
     }
 

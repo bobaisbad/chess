@@ -5,13 +5,11 @@ import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
-import exceptions.DataAccessException;
 import exceptions.ParentException;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -21,12 +19,10 @@ import java.io.IOException;
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
-    private final UserDAO userAccess;
     private final GameDAO gameAccess;
     private final AuthDAO authAccess;
 
     public WebSocketHandler(UserDAO userAccess, GameDAO gameAccess, AuthDAO authAccess) {
-        this.userAccess = userAccess;
         this.gameAccess = gameAccess;
         this.authAccess = authAccess;
     }
@@ -72,7 +68,7 @@ public class WebSocketHandler {
         serverMsg.setGame(game);
         connections.send(authToken, session, serverMsg);
         serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
-        serverMsg.setGame(game);
+//        serverMsg.setGame(game);
         connections.broadcast(gameID, authToken, serverMsg);
     }
 
@@ -113,14 +109,6 @@ public class WebSocketHandler {
             return;
         }
 
-//        System.out.println("Start Row: " + start.getRow());
-//        System.out.println("Start Col: " + start.getColumn());
-//        System.out.println("End Row: " + move.getEndPosition().getRow());
-//        System.out.println("End Col: " + move.getEndPosition().getColumn());
-//        System.out.println("Piece: " + piece);
-//        System.out.println("Player color: " + color);
-//        System.out.println("Turn: " + game.getTeamTurn());
-
         try {
             game.makeMove(move);
         } catch (InvalidMoveException e) {
@@ -153,13 +141,11 @@ public class WebSocketHandler {
         } else if (check && mate && !stale) { // checkmate
             notification = enemy + " is in checkmate!";
             serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
-//            serverMsg.setGameOver(true);
             serverMsg.setWinner(color);
             connections.broadcast(gameID, "", serverMsg);
         } else if (!check && mate && stale) { // stalemate
             notification = "Stalemate!";
             serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
-//            serverMsg.setGameOver(true);
             connections.broadcast(gameID, "", serverMsg);
         }
     }
@@ -191,10 +177,6 @@ public class WebSocketHandler {
     private void resign(int gameID, String authToken, String color, Session session) throws ParentException, IOException {
         String username = authAccess.getUsername(authToken);
 
-//        gameAccess.updateGameState(gameID, game);
-//        ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, null);
-//        serverMsg.setGame(game);
-//        connections.broadcast(gameID, authToken, serverMsg);
         if (authAccess.validateAuth(authToken)) {
             String error = "Error: invalid authToken";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
