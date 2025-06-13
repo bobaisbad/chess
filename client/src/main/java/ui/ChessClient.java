@@ -230,8 +230,8 @@ public class ChessClient {
     private String move(String[] params) throws ParentException {
         try {
             if (params.length == 2) {
-                ChessPosition start = new ChessPosition(params[0].charAt(0) - 96, params[0].charAt(1));
-                ChessPosition end = new ChessPosition(params[1].charAt(0) - 96, params[1].charAt(1));
+                ChessPosition start = new ChessPosition((int) params[0].charAt(1) - 48, (int) params[0].charAt(0) - 96);
+                ChessPosition end = new ChessPosition((int) params[1].charAt(1) - 48, (int) params[1].charAt(0) - 96);
                 ChessMove move = new ChessMove(start, end, null);
 //                game.makeMove(move);
 
@@ -369,9 +369,9 @@ public class ChessClient {
         return resigned;
     }
 
-//    public void setGame(ChessGame game) {
-//        this.game = game;
-//    }
+    public void setGame(ChessGame game) {
+        this.game = game;
+    }
 
 //    public void setHandler(NotificationHandler handler) {
 //        this.handler = handler;

@@ -31,13 +31,14 @@ public class GameRepl implements NotificationHandler {
                 break;
             }
 
-            this.game = (game == null) ? client.getGame() : game;
+//            this.game = (game == null) ? client.getGame() : game;
+            this.game = client.getGame();
 
-//            if (client.getColor().equals("black")) {
-//                printBoardBlack(out);
-//            } else {
-//                printBoardWhite(out);
-//            }
+            if (client.getColor().equals("black")) {
+                printBoardBlack(out);
+            } else {
+                printBoardWhite(out);
+            }
 
             printPrompt();
             String line = scanner.nextLine();
@@ -71,7 +72,7 @@ public class GameRepl implements NotificationHandler {
 
     public void notify(ServerMessage msg) {
         if (msg.getGame() != null) {
-//            client.setGame(msg.getGame());
+            client.setGame(msg.getGame());
 //            this.game = client.getGame();
             this.game = msg.getGame();
         }
@@ -86,6 +87,8 @@ public class GameRepl implements NotificationHandler {
 
         if (msg.getServerMessage() != null) {
             System.out.println(SET_TEXT_COLOR_RED + msg.getServerMessage());
+        } else if (msg.getErrorMessage() != null) {
+            System.out.println(SET_TEXT_COLOR_RED + msg.getErrorMessage());
         }
 
         if (msg.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
@@ -97,7 +100,7 @@ public class GameRepl implements NotificationHandler {
                 }
             }
         }
-//        printPrompt();
+        printPrompt();
     }
 
     private void printPrompt() {

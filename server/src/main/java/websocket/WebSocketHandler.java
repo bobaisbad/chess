@@ -112,6 +112,14 @@ public class WebSocketHandler {
             return;
         }
 
+//        System.out.println("Start Row: " + start.getRow());
+//        System.out.println("Start Col: " + start.getColumn());
+//        System.out.println("End Row: " + move.getEndPosition().getRow());
+//        System.out.println("End Col: " + move.getEndPosition().getColumn());
+//        System.out.println("Piece: " + piece);
+//        System.out.println("Player color: " + color);
+//        System.out.println("Turn: " + game.getTeamTurn());
+
         try {
             game.makeMove(move);
         } catch (InvalidMoveException e) {

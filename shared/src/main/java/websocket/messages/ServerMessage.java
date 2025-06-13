@@ -38,6 +38,10 @@ public class ServerMessage {
         return this.message;
     }
 
+    public String getErrorMessage() {
+        return this.errorMessage;
+    }
+
     public void setGame(ChessGame game) {
         this.game = game;
     }
