@@ -10,6 +10,7 @@ import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -20,7 +21,7 @@ public class ChessClient {
     private boolean loggedIn = false;
     private boolean gameStatus = false;
     private String userColor = null;
-//    private ChessGame game = null;
+    private ChessGame game = null;
     private int gameID;
     private boolean quit = false;
     private boolean resigned = false;
@@ -63,7 +64,7 @@ public class ChessClient {
                 case "redraw" -> "redraw";
                 case "move" -> move(cmd.params());
                 case "resign" -> resign(cmd.params());
-//                case "highlight" -> highlight(cmd.params());
+                case "highlight" -> highlight(cmd.params());
                 default -> help();
             };
         } catch (ParentException ex) {
@@ -159,6 +160,16 @@ public class ChessClient {
         if (params.length == 1) {
             CreateRequest req = new CreateRequest(params[0], authToken);
             server.create(req);
+
+            ListRequest req2 = new ListRequest(authToken);
+            ListResult res = server.list(req2);
+            GameInfo[] games = res.games().toArray(new GameInfo[0]);
+            listedGames.clear();
+
+            for (int i = 0; i < games.length; i++) {
+                listedGames.put("" + (i + 1), games[i].gameID());
+            }
+
             return "Created the chess game " + params[0];
         }
         throw new ParentException("Expected: <gameName>", 400);
@@ -243,9 +254,22 @@ public class ChessClient {
         }
     }
 
-//    private String highlight(String[] params) throws ParentException {
-//        //
-//    }
+    private String highlight(String[] params) throws ParentException {
+        if (params.length == 1) {
+            ChessPosition pos = new ChessPosition((int) params[0].charAt(1) - 48, (int) params[0].charAt(0) - 96);
+//            Chessgame.getBoard().getPiece(pos);
+            ChessMove[] moves = (game.validMoves(pos) == null) ? new ChessMove[0] : game.validMoves(pos).toArray(new ChessMove[0]);
+
+            if (userColor.equals("white") || userColor == null) {
+                handler.printBoardWhite(moves);
+            } else {
+                handler.printBoardBlack(moves);
+            }
+
+            return "";
+        }
+        throw new ParentException("Expected <piece>", 400);
+    }
 
     private String help() {
         if (!loggedIn) {
@@ -350,9 +374,9 @@ public class ChessClient {
         return resigned;
     }
 
-//    public void setGame(ChessGame game) {
-//        this.game = game;
-//    }
+    public void setGame(ChessGame game) {
+        this.game = game;
+    }
 
 //    public void setHandler(NotificationHandler handler) {
 //        this.handler = handler;
