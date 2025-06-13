@@ -144,20 +144,7 @@ public class GameRepl implements NotificationHandler {
                     setBrown(out);
                 }
 
-                for (ChessMove move : moves) {
-                    if (move.getEndPosition().getRow() == numbers[i] && move.getEndPosition().getColumn() == letters[j] - 96) {
-
-                        if (j % 2 == 0 && i % 2 == 0) {
-                            setGreen(out);
-                        } else if (j % 2 == 1 && i % 2 == 1) {
-                            setGreen(out);
-                        } else {
-                            setDarkGreen(out);
-                        }
-                    } else if (move.getStartPosition().getRow() == numbers[i] && move.getStartPosition().getColumn() == letters[j] - 96) {
-                        setBlue(out);
-                    }
-                }
+                setMoves(i, j, moves, numbers, letters);
 
                 position.setCol(letters[j] - 96);
                 position.setRow(numbers[i]);
@@ -178,6 +165,23 @@ public class GameRepl implements NotificationHandler {
             out.print(RESET_TEXT_BOLD_FAINT);
             setDefault(out);
             out.println();
+        }
+    }
+
+    private void setMoves(int i, int j, ChessMove[] moves, int[] numbers, char[] letters) {
+        for (ChessMove move : moves) {
+            if (move.getEndPosition().getRow() == numbers[i] && move.getEndPosition().getColumn() == letters[j] - 96) {
+
+                if (j % 2 == 0 && i % 2 == 0) {
+                    setGreen(out);
+                } else if (j % 2 == 1 && i % 2 == 1) {
+                    setGreen(out);
+                } else {
+                    setDarkGreen(out);
+                }
+            } else if (move.getStartPosition().getRow() == numbers[i] && move.getStartPosition().getColumn() == letters[j] - 96) {
+                setBlue(out);
+            }
         }
     }
 
