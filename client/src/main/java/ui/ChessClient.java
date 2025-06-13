@@ -8,7 +8,7 @@ import result.*;
 import server.ServerFacade;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
-import websocket.commands.MoveCommand;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public class ChessClient {
     private boolean loggedIn = false;
     private boolean gameStatus = false;
     private String userColor = null;
-    private ChessGame game = null;
+//    private ChessGame game = null;
     private int gameID;
     private boolean quit = false;
     private boolean resigned = false;
@@ -60,7 +60,7 @@ public class ChessClient {
             return switch (cmd.cmd()) {
                 case "quit" -> quit();
                 case "leave" -> leave();
-                case "redraw" -> "";
+                case "redraw" -> "redraw";
                 case "move" -> move(cmd.params());
                 case "resign" -> resign(cmd.params());
 //                case "highlight" -> highlight(cmd.params());
@@ -96,7 +96,7 @@ public class ChessClient {
             return switch (cmd.cmd()) {
                 case "quit" -> quit();
                 case "leave" -> leave();
-                case "redraw" -> "";
+                case "redraw" -> "redraw";
                 default -> help();
             };
         } catch (ParentException ex) {
@@ -158,7 +158,7 @@ public class ChessClient {
     private String create(String[] params) throws ParentException {
         if (params.length == 1) {
             CreateRequest req = new CreateRequest(params[0], authToken);
-            CreateResult res = server.create(req);
+            server.create(req);
             return "Created the chess game " + params[0];
         }
         throw new ParentException("Expected: <gameName>", 400);
@@ -193,13 +193,13 @@ public class ChessClient {
             if (params.length == 2) {
                 gameID = (listedGames.get(params[0]) == null) ? 0: listedGames.get(params[0]);
                 JoinRequest req = new JoinRequest(params[1], gameID, authToken);
-                JoinResult res = server.join(req);
                 server.join(req);
+
                 gameStatus = true;
                 resigned = false;
                 userColor = params[1];
-                game = res.game();
                 handler = (handler == null) ? pre.getGameRepl() : handler;
+
                 ws = new WebSocketFacade(serverURL, handler);
                 ws.joinGame(authToken, userColor, gameID);
                 return "";
@@ -233,33 +233,10 @@ public class ChessClient {
                 ChessPosition start = new ChessPosition((int) params[0].charAt(1) - 48, (int) params[0].charAt(0) - 96);
                 ChessPosition end = new ChessPosition((int) params[1].charAt(1) - 48, (int) params[1].charAt(0) - 96);
                 ChessMove move = new ChessMove(start, end, null);
-//                game.makeMove(move);
-
-//                ChessGame.TeamColor team = (userColor.equals("white")) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
-//                boolean check = game.isInCheck(team);
-//                boolean mate = game.isInCheckmate(team);
-//                boolean stale = game.isInStalemate(team);
-//                MoveCommand moveCmd = new MoveCommand(move, userColor);
-                // f t t = stale
-                // t f f = check
-                // t t f = mate
 
                 ws.makeMove(authToken, gameID, move, userColor);
                 return "";
-            } // else if (params.length == 3) {
-//                ChessPiece.PieceType type = switch (params[2]) {
-//                    case "queen" -> ChessPiece.PieceType.QUEEN;
-//                    case "rook" -> ChessPiece.PieceType.ROOK;
-//                    case "knight" -> ChessPiece.PieceType.KNIGHT;
-//                    case "bishop" -> ChessPiece.PieceType.BISHOP;
-//                    default -> throw new ParentException("Expected <piece> <move> <pawn promotion>", 400);
-//                };
-//
-//                ChessPosition start = new ChessPosition(params[0].charAt(0) - 96, params[0].charAt(1));
-//                ChessPosition end = new ChessPosition(params[1].charAt(0) - 96, params[1].charAt(1));
-//                ChessMove move = new ChessMove(start, end, type);
-//                game.makeMove(move);
-//            }
+            }
             throw new ParentException("Expected <piece> <move>", 400);
         } catch (ParentException ex) {
             throw new ParentException(ex.getMessage(), 400);
@@ -287,7 +264,7 @@ public class ChessClient {
                    quit - leave the program
                    help - print out possible commands""";
         } else if (resigned) {
-                return """
+            return """
                    redraw - redraws the chess board
                    leave - leave the current game
                    quit - leave the program
@@ -345,6 +322,10 @@ public class ChessClient {
         return "";
     }
 
+//    private String redraw() {
+//        return "draw";
+//    }
+
     public boolean getLoginStatus() {
         return loggedIn;
     }
@@ -357,9 +338,9 @@ public class ChessClient {
         return userColor;
     }
 
-    public ChessGame getGame() {
-        return game;
-    }
+//    public ChessGame getGame() {
+//        return game;
+//    }
 
     public boolean getQuit() {
         return quit;
@@ -369,9 +350,9 @@ public class ChessClient {
         return resigned;
     }
 
-    public void setGame(ChessGame game) {
-        this.game = game;
-    }
+//    public void setGame(ChessGame game) {
+//        this.game = game;
+//    }
 
 //    public void setHandler(NotificationHandler handler) {
 //        this.handler = handler;

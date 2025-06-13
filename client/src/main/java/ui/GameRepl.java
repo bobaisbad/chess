@@ -19,11 +19,10 @@ public class GameRepl implements NotificationHandler {
 
     public void run(ChessClient client, Scanner scanner) {
         this.client = client;
-//        client.setHandler(this);
 
         var result = "";
         this.out = (out == null) ? new PrintStream(System.out, true, StandardCharsets.UTF_8) : out;
-        System.out.print("\n");
+//        System.out.print("\n");
 
         while (!client.getQuit() && client.getGameStatus()) {
             if (client.getResigned()) {
@@ -32,63 +31,77 @@ public class GameRepl implements NotificationHandler {
             }
 
 //            this.game = (game == null) ? client.getGame() : game;
-            this.game = client.getGame();
+//            this.game = client.getGame();
+//
+//            if (client.getColor().equals("black")) {
+//                printBoardBlack(out);
+//            } else {
+//                printBoardWhite(out);
+//            }
 
-            if (client.getColor().equals("black")) {
-                printBoardBlack(out);
-            } else {
-                printBoardWhite(out);
-            }
+//            printPrompt();
+//            try {
+//                wait(1000);
+//            } catch (InterruptedException ex) {
+//                System.out.print("");
+//            }
 
             printPrompt();
             String line = scanner.nextLine();
             result = client.gameEval(line);
+//            System.out.print(SET_TEXT_COLOR_BLUE + result);
 
             if (result.equals("resign")) {
                 System.out.print(SET_TEXT_COLOR_BLUE + "Are you sure you want to resign and end the game? (y/n)");
                 printPrompt();
                 line = scanner.nextLine();
                 client.gameEval("resign " + line);
+            } else if (result.equals("redraw")) {
+                System.out.print("\n");
+                if (client.getColor().equals("white") || client.getColor() == null) {
+                    printBoardWhite(out);
+                } else {
+                    printBoardBlack(out);
+                }
             } else {
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
-                System.out.print("\n");
+//                System.out.print("\n");
             }
-        }
-    }
 
-    private void resigned(ChessClient client, Scanner scanner, PrintStream out) {
-        var result = "";
-
-        while (client.getGameStatus()) {
-//            this.game = client.getGame();
-            printBoardWhite(out);
-            printPrompt();
-            String line = scanner.nextLine();
-            result = client.resignedEval(line);
-            System.out.print(SET_TEXT_COLOR_BLUE + result);
-            System.out.print("\n");
+//            if (line.equalsIgnoreCase("help")) {
+//                System.out.print("\n");
+//                printPrompt();
+//            }
         }
     }
 
     public void notify(ServerMessage msg) {
         if (msg.getGame() != null) {
-            client.setGame(msg.getGame());
+//            client.setGame(msg.getGame());
 //            this.game = client.getGame();
             this.game = msg.getGame();
         }
 
-        if (msg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            if (client.getColor().equals("black")) {
-                printBoardBlack(out);
-            } else {
-                printBoardWhite(out);
-            }
-        }
+//        if (msg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+//            if (client.getColor().equals("black")) {
+//                printBoardBlack(out);
+//            } else {
+//                printBoardWhite(out);
+//            }
+//        }
+
+//        if (client.getColor() == null || client.getColor().equals("white")) {
+//            printBoardWhite(out);
+//        } else {
+//            printBoardBlack(out);
+//        }
 
         if (msg.getServerMessage() != null) {
-            System.out.println(SET_TEXT_COLOR_RED + msg.getServerMessage());
+            System.out.print(SET_TEXT_COLOR_RED + msg.getServerMessage() + "\n");
+            printPrompt();
         } else if (msg.getErrorMessage() != null) {
-            System.out.println(SET_TEXT_COLOR_RED + msg.getErrorMessage());
+            System.out.print(SET_TEXT_COLOR_RED + msg.getErrorMessage() + "\n");
+            printPrompt();
         }
 
         if (msg.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
@@ -96,11 +109,36 @@ public class GameRepl implements NotificationHandler {
                 client.setResigned(true);
                 game.setGameOver(true);
                 if (client.getColor().equals(msg.getWinner())) {
-                    System.out.println(SET_TEXT_COLOR_RED + "You won!");
+                    System.out.print(SET_TEXT_COLOR_RED + "You won!" + "\n");
+                    printPrompt();
                 }
             }
         }
-        printPrompt();
+
+//        if (client.getColor() == null || client.getColor().equals("white")) {
+//            printBoardWhite(out);
+//        } else {
+//            printBoardBlack(out);
+//        }
+
+//        printPrompt();
+    }
+
+    private void resigned(ChessClient client, Scanner scanner, PrintStream out) {
+        var result = "";
+
+        while (client.getGameStatus()) {
+//            this.game = client.getGame();
+//            printBoardWhite(out);
+//            printPrompt();
+            String line = scanner.nextLine();
+            result = client.resignedEval(line);
+            System.out.print(SET_TEXT_COLOR_BLUE + result);
+            if (line.equalsIgnoreCase("help")) {
+                System.out.print("\n");
+                printPrompt();
+            }
+        }
     }
 
     private void printPrompt() {

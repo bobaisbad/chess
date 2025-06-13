@@ -72,6 +72,7 @@ public class WebSocketHandler {
         serverMsg.setGame(game);
         connections.send(authToken, session, serverMsg);
         serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
+        serverMsg.setGame(game);
         connections.broadcast(gameID, authToken, serverMsg);
     }
 
@@ -219,7 +220,7 @@ public class WebSocketHandler {
         gameAccess.updateGameState(gameID, data.game());
 
         String notification = username + " as " + color + " resigned the game";
-        String msg = "You resigned the game as " + color;
+        String msg = "You resigned the game";
 
         ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg, null);
         connections.send(authToken, session, serverMsg);
