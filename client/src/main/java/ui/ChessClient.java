@@ -17,7 +17,7 @@ public class ChessClient {
     private final ServerFacade server;
     private boolean loggedIn = false;
     private boolean gameStatus = false;
-    private String userColor = null;
+    private ChessGame.TeamColor userColor = null;
     private ChessGame game = null;
     private int gameID;
     private boolean quit = false;
@@ -51,6 +51,11 @@ public class ChessClient {
     }
 
     public String gameEval(String input) {
+        if (resigned || game.getGameOver()) {
+            resigned = true;
+            return resignedEval(input);
+        }
+
         Command cmd = getCommand(input);
 
         try {
@@ -204,7 +209,7 @@ public class ChessClient {
 
                 gameStatus = true;
                 resigned = false;
-                userColor = params[1];
+                userColor = (params[1].equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                 handler = (handler == null) ? pre.getGameRepl() : handler;
 
                 ws = new WebSocketFacade(serverURL, handler);
@@ -224,6 +229,7 @@ public class ChessClient {
             gameID = (listedGames.get(params[0]) == null) ? 0: listedGames.get(params[0]);
             gameStatus = true;
             resigned = true;
+            userColor = null;
             handler = (handler == null) ? pre.getGameRepl() : handler;
             ws = new WebSocketFacade(serverURL, handler);
             ws.joinGame(authToken, userColor, gameID);
@@ -253,7 +259,7 @@ public class ChessClient {
             ChessPosition pos = new ChessPosition((int) params[0].charAt(1) - 48, (int) params[0].charAt(0) - 96);
             ChessMove[] moves = (game.validMoves(pos) == null) ? new ChessMove[0] : game.validMoves(pos).toArray(new ChessMove[0]);
 
-            if (userColor.equals("white") || userColor == null) {
+            if (userColor == ChessGame.TeamColor.WHITE || userColor == null) {
                 handler.printBoardWhite(moves);
             } else {
                 handler.printBoardBlack(moves);
@@ -315,6 +321,7 @@ public class ChessClient {
     private String leave() throws ParentException {
         gameStatus = false;
         resigned = false;
+        userColor = null;
         ws.leave(authToken, gameID, userColor);
         return "Leaving the game...";
     }
@@ -338,7 +345,7 @@ public class ChessClient {
         return gameStatus;
     }
 
-    public String getColor() {
+    public ChessGame.TeamColor getColor() {
         return userColor;
     }
 

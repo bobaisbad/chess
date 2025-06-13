@@ -33,12 +33,12 @@ public class WebSocketHandler {
         switch (cmd.getCommandType()) {
             case CONNECT -> connect(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor(), session);
             case MAKE_MOVE -> move(cmd.getAuthToken(), cmd.getGameID(), cmd.getMove(), cmd.getColor(), session);
-            case LEAVE -> leave(cmd.getGameID(), cmd.getColor(), cmd.getAuthToken(), session);
-            case RESIGN -> resign(cmd.getGameID(), cmd.getAuthToken(), cmd.getColor(), session);
+            case LEAVE -> leave(cmd.getGameID(), cmd.getAuthToken(), session);
+            case RESIGN -> resign(cmd.getGameID(), cmd.getAuthToken(), session);
         }
     }
 
-    private void connect(int gameID, String authToken, String color, Session session) throws ParentException, IOException {
+    private void connect(int gameID, String authToken, ChessGame.TeamColor color, Session session) throws ParentException, IOException {
         String username = authAccess.getUsername(authToken);
         connections.add(authToken, session, gameID, username);
 
@@ -62,7 +62,8 @@ public class WebSocketHandler {
 
         ChessGame game = data.game();
 
-        String notification = username + " just joined the game as " + ((color != null) ? color : "an observer");
+        String notification = username + " just joined the game as "
+                            + ((color != null) ? ((color == ChessGame.TeamColor.WHITE) ? "white" : "black") : "an observer");
 
         ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, null);
         serverMsg.setGame(game);
@@ -72,7 +73,7 @@ public class WebSocketHandler {
         connections.broadcast(gameID, authToken, serverMsg);
     }
 
-    private void move(String authToken, int gameID, ChessMove move, String color, Session session) throws ParentException, IOException {
+    private void move(String authToken, int gameID, ChessMove move, ChessGame.TeamColor color, Session session) throws ParentException, IOException {
         String username = authAccess.getUsername(authToken);
 
         if (authAccess.validateAuth(authToken)) {
@@ -94,15 +95,15 @@ public class WebSocketHandler {
 
         ChessPosition start = move.getStartPosition();
         ChessPiece piece = game.getBoard().getPiece(start);
-        String pieceColor = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? "white" : "black";
+//        String pieceColor = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? "white" : "black";
 
         if (username.equals(data.whiteUsername())) {
-            color = "white";
+            color = ChessGame.TeamColor.WHITE;
         } else if (username.equals(data.blackUsername())) {
-            color = "black";
+            color = ChessGame.TeamColor.BLACK;
         }
 
-        if (!pieceColor.equals(color)) {
+        if (piece.getTeamColor() != color) {
             String error = "Error: invalid move";
             ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, error);
             connections.send(authToken, session, serverMsg);
@@ -123,13 +124,13 @@ public class WebSocketHandler {
         serverMsg.setGame(game);
         connections.broadcast(gameID, "", serverMsg);
 
-        String notification = username + " moved " + move.getStartPosition() + " to " + move.getEndPosition();
+        String notification = username + " moved " + move.getStartPosition().toString() + " to " + move.getEndPosition().toString();
         serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
         connections.broadcast(gameID, authToken, serverMsg);
 
-        String enemy = (color.equals("white")) ? data.blackUsername() : data.whiteUsername();
+        String enemy = (color == ChessGame.TeamColor.WHITE) ? data.blackUsername() : data.whiteUsername();
 
-        ChessGame.TeamColor team = (color.equals("white")) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+        ChessGame.TeamColor team = (color == ChessGame.TeamColor.WHITE) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
         boolean check = game.isInCheck(team);
         boolean mate = game.isInCheckmate(team);
         boolean stale = game.isInStalemate(team);
@@ -142,15 +143,17 @@ public class WebSocketHandler {
             notification = enemy + " is in checkmate!";
             serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
             serverMsg.setWinner(color);
+            serverMsg.setGameOver(true);
             connections.broadcast(gameID, "", serverMsg);
         } else if (!check && mate && stale) { // stalemate
             notification = "Stalemate!";
             serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
+            serverMsg.setGameOver(true);
             connections.broadcast(gameID, "", serverMsg);
         }
     }
 
-    private void leave(int gameID, String color, String authToken, Session session) throws ParentException, IOException {
+    private void leave(int gameID, String authToken, Session session) throws ParentException, IOException {
         String username = authAccess.getUsername(authToken);
 
         if (authAccess.validateAuth(authToken)) {
@@ -168,13 +171,13 @@ public class WebSocketHandler {
             gameAccess.updateGame(data, "black", null);
         }
 
-        String notification = username + " as " + color + " left the game";
+        String notification = username + " left the game";
         ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
         connections.broadcast(gameID, authToken, serverMsg);
         connections.remove(authToken);
     }
 
-    private void resign(int gameID, String authToken, String color, Session session) throws ParentException, IOException {
+    private void resign(int gameID, String authToken, Session session) throws ParentException, IOException {
         String username = authAccess.getUsername(authToken);
 
         if (authAccess.validateAuth(authToken)) {
@@ -201,12 +204,14 @@ public class WebSocketHandler {
         data.game().setGameOver(true);
         gameAccess.updateGameState(gameID, data.game());
 
-        String notification = username + " as " + color + " resigned the game";
+        String notification = username + " resigned the game";
         String msg = "You resigned the game";
 
         ServerMessage serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg, null);
+        serverMsg.setGameOver(true);
         connections.send(authToken, session, serverMsg);
         serverMsg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification, null);
+        serverMsg.setGameOver(true);
         connections.broadcast(gameID, authToken, serverMsg);
     }
 }

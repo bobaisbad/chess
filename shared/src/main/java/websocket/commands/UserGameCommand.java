@@ -19,7 +19,7 @@ public class UserGameCommand {
 
     private final Integer gameID;
 
-    private String color;
+    private ChessGame.TeamColor color;
     private ChessMove move;
     private ChessGame game;
 
@@ -48,11 +48,11 @@ public class UserGameCommand {
         return gameID;
     }
 
-    public void setColor(String color) {
+    public void setColor(ChessGame.TeamColor color) {
         this.color = color;
     }
 
-    public String getColor() {
+    public ChessGame.TeamColor getColor() {
         return this.color;
     }
 

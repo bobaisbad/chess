@@ -16,7 +16,7 @@ public class ServerMessage {
     String errorMessage;
     ChessGame game;
     boolean gameOver = false;
-    String winner;
+    ChessGame.TeamColor winner;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -58,11 +58,11 @@ public class ServerMessage {
         return this.gameOver;
     }
 
-    public void setWinner(String winner) {
+    public void setWinner(ChessGame.TeamColor winner) {
         this.winner = winner;
     }
 
-    public String getWinner() {
+    public ChessGame.TeamColor getWinner() {
         return this.winner;
     }
 

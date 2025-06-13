@@ -28,22 +28,23 @@ public class GameRepl implements NotificationHandler {
 
             printPrompt();
             String line = scanner.nextLine();
+            client.setGame(game);
             result = client.gameEval(line);
 
-            if (result.equals("resign")) {
+            if (result.equals("resign") && !client.getResigned()) {
                 System.out.print(SET_TEXT_COLOR_BLUE + "Are you sure you want to resign and end the game? (y/n)");
                 printPrompt();
                 line = scanner.nextLine();
                 client.gameEval("resign " + line);
             } else if (result.equals("redraw")) {
                 System.out.print("\n");
-                if (client.getColor().equals("white") || client.getColor() == null) {
+                if (client.getColor() == null || client.getColor() == ChessGame.TeamColor.WHITE) {
                     printBoardWhite(new ChessMove[0]);
                 } else {
                     printBoardBlack(new ChessMove[0]);
                 }
             } else {
-                System.out.print(SET_TEXT_COLOR_BLUE + result);
+                System.out.print(SET_TEXT_COLOR_BLUE + result + "\n");
             }
         }
     }
@@ -78,19 +79,39 @@ public class GameRepl implements NotificationHandler {
         var result = "";
 
         while (client.getGameStatus()) {
+            printPrompt();
             String line = scanner.nextLine();
             result = client.resignedEval(line);
-            System.out.print(SET_TEXT_COLOR_BLUE + result);
 
-            if (line.equalsIgnoreCase("help")) {
+            if (result.equals("redraw")) {
                 System.out.print("\n");
-                printPrompt();
+                printBoardWhite(new ChessMove[0]);
+            } else {
+                System.out.print(SET_TEXT_COLOR_BLUE + result + "\n");
             }
         }
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + ">>> ");
+        if (game != null) {
+             if(!client.getResigned() && !game.getGameOver()) {
+                 if (client.getColor() == game.getTeamTurn()) {
+                     System.out.print("\n" + RESET_TEXT_COLOR + "[YOUR_TURN] >>> ");
+                 } else {
+                     System.out.print("\n" + RESET_TEXT_COLOR + "[" +
+                                      ((client.getColor() == ChessGame.TeamColor.WHITE) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE) +
+                                      "_TURN] >>> ");
+                 }
+             } else if (client.getColor() == null && client.getResigned() && !game.getGameOver()) {
+                 System.out.print("\n" + RESET_TEXT_COLOR + "[OBSERVER] >>> ");
+             } else if (client.getResigned() && game.getGameOver()) {
+                 System.out.print("\n" + RESET_TEXT_COLOR + "[GAME_OVER] >>> ");
+             } else {
+                 System.out.print("\n" + RESET_TEXT_COLOR + ">>> ");
+             }
+        } else {
+            System.out.print("\n" + RESET_TEXT_COLOR + ">>> ");
+        }
     }
 
     public void printBoardBlack(ChessMove[] moves) {
